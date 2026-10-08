@@ -182,6 +182,65 @@
   accent-color: var(--primaryColor);
 }
 
+/* Tinted variants driven by the same vars the ColorStore writes to
+   (see store/ColorStore.js + App.jsx) — use these instead of hardcoded
+   shades so components follow admin color changes automatically */
+.primaryBgGradient {
+  background-image: linear-gradient(
+    135deg,
+    var(--primaryColor) 0%,
+    color-mix(in oklab, var(--primaryColor) 80%, var(--secondaryColor)) 100%
+  );
+}
+
+.secondaryBgFaint {
+  background-color: color-mix(in oklab, var(--secondaryColor) 22%, transparent);
+}
+
+.secondaryTextMuted {
+  color: color-mix(in oklab, var(--secondaryColor) 55%, transparent);
+}
+
+.secondaryPlaceholder {
+  --tw-placeholder-color: color-mix(
+    in oklab,
+    var(--secondaryColor) 50%,
+    transparent
+  );
+}
+
+.accentBgSoft {
+  background-color: color-mix(in oklab, var(--accentColor) 12%, transparent);
+}
+
+.accentBgFaint {
+  background-color: color-mix(in oklab, var(--accentColor) 6%, transparent);
+}
+
+.accentRingSoft {
+  --tw-ring-color: color-mix(in oklab, var(--accentColor) 20%, transparent);
+}
+
+.accentRingFaint {
+  --tw-ring-color: color-mix(in oklab, var(--accentColor) 12%, transparent);
+}
+
+.accentTextSoft {
+  color: color-mix(in oklab, var(--accentColor) 80%, transparent);
+}
+
+.accentTextMuted {
+  color: color-mix(in oklab, var(--accentColor) 60%, transparent);
+}
+
+.accentTextFaint {
+  color: color-mix(in oklab, var(--accentColor) 45%, transparent);
+}
+
+.accentTextAlert {
+  color: color-mix(in oklab, #fecaca 85%, var(--accentColor));
+}
+
 .rendered-html {
   @apply text-gray-800 leading-relaxed;
 }
