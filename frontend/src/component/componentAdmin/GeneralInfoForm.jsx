@@ -250,19 +250,19 @@ export default function GeneralInfoForm() {
                 label="Primary Logo"
                 name="PrimaryLogo"
                 preview={previews.PrimaryLogo}
-                existing={formData.PrimaryLogo}
+                existing={files.PrimaryLogo instanceof File ? null : files.PrimaryLogo}
               />
               <ImageUploadCard
                 label="Secondary Logo"
                 name="SecondaryLogo"
                 preview={previews.SecondaryLogo}
-                existing={formData.SecondaryLogo}
+                existing={files.SecondaryLogo instanceof File ? null : files.SecondaryLogo}
               />
               <ImageUploadCard
                 label="Favicon"
                 name="Favicon"
                 preview={previews.Favicon}
-                existing={formData.Favicon}
+                existing={files.Favicon instanceof File ? null : files.Favicon}
               />
             </div>
           </CardContent>
