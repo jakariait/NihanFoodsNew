@@ -21,7 +21,7 @@ A full-featured eCommerce platform built using the **MERN Stack** (MongoDB, Expr
 - **Product Management:** Full CRUD operations for products, including variants (colors, sizes), images, categories, subcategories, and flags.
 - **Order Management:** Track, update, and analyze orders with detailed analytics.
 - **User Management:** Role-based access control and user administration.
-- **Content Management:** Manage blogs, FAQs, page content, carousels, feature images, marquee messages, social media links, and general information.
+- **Content Management:** Manage blogs, FAQs, page content, carousels, marquee messages, social media links, and general information.
 - **Promotions & Discounts:** Create and manage promo codes and free delivery settings.
 - **Shipping & Payments:** Configure shipping methods (e.g., Steadfast courier integration), VAT percentages, and payment gateways (e.g., bKash configuration).
 - **SEO Tools:** Manage meta tags and Google Tag Manager settings.

@@ -158,39 +158,6 @@ const Headers = () => {
 
   return (
     <div>
-      {/* Top Bar */}
-      <div className={'primaryBgColor text-white '}>
-        {' '}
-        <div className="flex gap-6 xl:container xl:mx-auto p-3 justify-center md:justify-start">
-          <h1 className="md:border-r-1 px-4">
-            Welcome to {GeneralInfoList?.CompanyName}
-          </h1>
-          <div className="items-center gap-2 border-r-1 px-4 hidden md:flex">
-            <Link
-              to="/track-order"
-              className="flex items-center gap-2"
-              aria-label="Track your order"
-            >
-              <TfiTruck aria-hidden="true" />
-              <p>Track Your Order</p>
-            </Link>
-          </div>
-          <div className="items-center gap-2 hidden md:flex">
-            <MdEmail className="text-2xl" aria-hidden="true" />
-            {GeneralInfoList?.CompanyEmail?.map((email, index) => (
-              <a
-                key={index}
-                href={`mailto:${email}`}
-                className="mr-2"
-                aria-label={`Email: ${email}`}
-              >
-                {email}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Header Main */}
       <div
         ref={headerMainRef}

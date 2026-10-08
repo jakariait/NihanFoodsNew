@@ -2,6 +2,7 @@ import GeneralInfoStore from '../../store/GeneralInfoStore.js';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import SocialMedia from './SocialMedia.jsx';
+import ImageComponent from './ImageComponent.jsx';
 import Skeleton from 'react-loading-skeleton';
 
 const QUICK_LINKS = [
@@ -22,8 +23,15 @@ const FooterHeading = ({ children }) => (
 
 const AboutSection = ({ generalInfo, variant }) => (
   <div className={variant === 'mobile' ? 'px-4' : 'col-span-6'}>
-    <FooterHeading>About Us</FooterHeading>
-    <p>{generalInfo?.ShortDescription}</p>
+    <Link to="/" aria-label={`${generalInfo?.CompanyName || 'Home'}`}>
+      <ImageComponent
+        imageName={generalInfo?.PrimaryLogo}
+        altName={generalInfo?.CompanyName}
+        className="h-9 w-auto object-contain"
+        skeletonHeight="36"
+      />
+    </Link>
+    <p className="mt-4 max-w-xl">{generalInfo?.ShortDescription}</p>
     <h2 className="mb-3 mt-3">Follow Us</h2>
     <SocialMedia />
   </div>

@@ -1,11 +1,49 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Slider from 'react-slick';
+import { Link } from 'react-router-dom';
 import CarouselStore from '../../store/CarouselStore.js';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Skeleton from 'react-loading-skeleton';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import ImageComponent from './ImageComponent.jsx';
+import { isRelativeLink, normalizeLink } from '@/utils/carouselLink';
+
+const Slide = ({ product, index }) => {
+  const image = (
+    <ImageComponent
+      imageName={product.imgSrc}
+      className="w-full h-full object-contain"
+      skeletonHeight={400}
+      altName={`Banner ${index + 1}`}
+      fetchpriority={index === 0 ? 'high' : undefined}
+    />
+  );
+
+  const link = normalizeLink(product.link);
+
+  if (!link) {
+    return <div className="relative">{image}</div>;
+  }
+
+  if (isRelativeLink(link)) {
+    return (
+      <div className="relative">
+        <Link to={link} className="block">
+          {image}
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <a href={link} className="block">
+        {image}
+      </a>
+    </div>
+  );
+};
 
 const ProductCarousel = () => {
   const {
@@ -62,15 +100,7 @@ const ProductCarousel = () => {
         <>
           <Slider ref={sliderRef} {...settings}>
             {products.map((product, index) => (
-              <div key={index} className="relative">
-                <ImageComponent
-                  imageName={product.imgSrc}
-                  className="w-full h-full object-contain"
-                  skeletonHeight={400}
-                  altName={`Banner ${index + 1}`}
-                  fetchpriority={index === 0 ? 'high' : undefined}
-                />
-              </div>
+              <Slide key={product._id || index} product={product} index={index} />
             ))}
           </Slider>
         </>
