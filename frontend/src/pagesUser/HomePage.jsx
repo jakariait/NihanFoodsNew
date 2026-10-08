@@ -5,8 +5,6 @@ import useProductStore from '../store/useProductStore.js';
 import ProductCarousel from '../component/componentGeneral/ProductCarousel.jsx';
 import Feature from '../component/componentGeneral/Feature.jsx';
 import ProductByFlag from '../component/componentGeneral/ProductByFlag.jsx';
-import Newsletter from '#component/componentGeneral/Newsletter.jsx';
-
 const HomePage = () => {
   const { CarouselStoreListRequest } = CarouselStore();
   const { FeatureStoreListRequest } = FeatureStore();
@@ -24,7 +22,6 @@ const HomePage = () => {
       <ProductCarousel />
       <Feature />
       <ProductByFlag />
-      <Newsletter />
     </>
   );
 };
