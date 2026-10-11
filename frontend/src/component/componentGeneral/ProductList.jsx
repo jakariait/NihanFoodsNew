@@ -140,13 +140,6 @@ const ProductList = ({ products }) => {
                         className="!p-1.5"
                       />
                     </div>
-                    <button
-                      onClick={() => handleOpen(product)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-sm ring-1 ring-black/5 cursor-pointer transition-colors hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
-                      aria-label={`Quick view ${product.name}`}
-                    >
-                      <FaEye className="text-[14px]" aria-hidden="true" />
-                    </button>
                   </div>
                 </div>
 
@@ -220,30 +213,6 @@ const ProductList = ({ products }) => {
               </div>
             );
           })}
-
-          {/* Quick View Modal */}
-          {selectedProduct && (
-            <Dialog
-              open={Boolean(selectedProduct)}
-              onOpenChange={(open) => !open && handleClose()}
-            >
-              <DialogContent className="sm:max-w-4xl w-[calc(100%-1.5rem)] p-3 sm:p-6 max-h-[95vh] overflow-y-auto scrollbar-hide rounded-xl">
-                <div className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-6">
-                  <ProductGallery
-                    images={selectedProduct.images}
-                    discount={calculateDiscountPercentage(
-                      selectedProduct.finalPrice,
-                      selectedProduct.finalDiscount,
-                    )}
-                    zoom={false}
-                  />
-                  <div>
-                    <ProductAddToCart product={selectedProduct} />
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
         </div>
       )}
     </div>
