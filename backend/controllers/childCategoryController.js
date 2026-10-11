@@ -6,6 +6,10 @@ const createChildCategory = async (req, res) => {
   try {
     const childCategoryData = req.body;
 
+    if (req.files?.image?.[0]?.filename) {
+      childCategoryData.image = req.files.image[0].filename;
+    }
+
     if (!childCategoryData.name || !childCategoryData.category || !childCategoryData.subCategory) {
       return res.status(400).json({
         message: 'Name, category, and subcategory are required fields.',
@@ -27,15 +31,15 @@ const createChildCategory = async (req, res) => {
 // Get all child categories
 const getAllChildCategories = async (req, res) => {
   try {
-    const childCategories = await childCategoryService.getAllChildCategories();
-    if (!childCategories || childCategories.length === 0) {
-      return res.status(404).json({
-        message: 'No child categories found',
-      });
+    const filter = {};
+    if (req.query.showInHomepage === 'true') {
+      filter.showInHomepage = true;
+      filter.isActive = true;
     }
+    const childCategories = await childCategoryService.getAllChildCategories(filter);
     res.status(200).json({
       message: 'Child categories fetched successfully',
-      childCategories,
+      childCategories: childCategories || [],
     });
   } catch (error) {
     res.status(500).json({
@@ -76,6 +80,10 @@ const getChildCategoryById = async (req, res) => {
 const updateChildCategory = async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
+
+  if (req.files?.image?.[0]?.filename) {
+    updatedData.image = req.files.image[0].filename;
+  }
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({

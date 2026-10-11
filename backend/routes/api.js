@@ -142,6 +142,10 @@ const upload = multer({ storage, fileFilter }).fields([
     name: 'userImage',
     maxCount: 1,
   },
+  {
+    name: 'image',
+    maxCount: 1,
+  },
 ]);
 
 //   Routes for General Information
@@ -313,12 +317,14 @@ router.get('/category', categoryController.getCategories);
 router.get('/category/:id', categoryController.getCategoryById);
 router.post(
   '/category/',
+  upload,
   adminProtect,
   checkPermission('category'),
   categoryController.createCategory
 );
 router.put(
   '/category/:id',
+  upload,
   adminProtect,
   checkPermission('category'),
   categoryController.updateCategory
@@ -337,12 +343,14 @@ router.post(
   '/sub-category',
   adminProtect,
   checkPermission('sub_category'),
+  upload,
   subCategoryController.createSubCategory
 );
 router.put(
   '/sub-category/:id',
   adminProtect,
   checkPermission('sub_category'),
+  upload,
   subCategoryController.updateSubCategory
 );
 router.delete(
@@ -359,12 +367,14 @@ router.post(
   '/child-category',
   adminProtect,
   checkPermission('child_category'),
+  upload,
   childCategoryController.createChildCategory
 );
 router.put(
   '/child-category/:id',
   adminProtect,
   checkPermission('child_category'),
+  upload,
   childCategoryController.updateChildCategory
 );
 router.delete(

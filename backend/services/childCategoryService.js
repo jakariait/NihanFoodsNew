@@ -1,4 +1,14 @@
 const ChildCategory = require('../models/ChildCategoryModel');
+const fs = require('fs');
+const path = require('path');
+
+const deleteOldFile = (filename) => {
+  if (!filename) return;
+  const filePath = path.join(__dirname, '../uploads', filename);
+  try {
+    fs.unlinkSync(filePath);
+  } catch {}
+};
 
 // Create a new child category
 const createChildCategory = async (childCategoryData) => {
@@ -16,9 +26,9 @@ const createChildCategory = async (childCategoryData) => {
 };
 
 // Get all child categories
-const getAllChildCategories = async () => {
+const getAllChildCategories = async (filter = {}) => {
   try {
-    const childCategories = await ChildCategory.find()
+    const childCategories = await ChildCategory.find(filter)
       .populate('category', 'name')
       .populate('subCategory', 'name')
       .select('-createdAt -updatedAt')
@@ -51,6 +61,19 @@ const getChildCategoryById = async (id) => {
 // Update a Child Category
 const updateChildCategory = async (id, updatedData) => {
   try {
+    const existing = await ChildCategory.findById(id);
+    if (!existing) throw new Error('Child Category not found');
+
+    if (updatedData.image && updatedData.image !== existing.image) {
+      deleteOldFile(existing.image);
+    } else if (updatedData.removeImage === 'true') {
+      deleteOldFile(existing.image);
+      updatedData.image = '';
+    } else {
+      updatedData.image = existing.image;
+    }
+    delete updatedData.removeImage;
+
     const childCategory = await ChildCategory.findByIdAndUpdate(id, updatedData, {
       new: true,
     })
@@ -60,7 +83,6 @@ const updateChildCategory = async (id, updatedData) => {
       .exec();
 
     if (!childCategory) throw new Error('Child Category not found');
-
     return childCategory;
   } catch (error) {
     throw new Error('Error updating child category: ' + error.message);
@@ -72,7 +94,7 @@ const deleteChildCategory = async (id) => {
   try {
     const childCategory = await ChildCategory.findByIdAndDelete(id);
     if (!childCategory) throw new Error('Child Category not found');
-
+    deleteOldFile(childCategory.image);
     return { message: 'Child Category deleted successfully' };
   } catch (error) {
     throw new Error('Error deleting child category: ' + error.message);

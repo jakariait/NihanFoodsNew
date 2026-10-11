@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import axios from 'axios';
 import useAuthAdminStore from '../../store/AuthAdminStore.js';
 import { Input } from '@/components/ui/input';
@@ -42,23 +42,27 @@ import { SectionHeader } from '@/component/componentAdmin/SectionHeader.jsx';
 
 const AdminCategoryAllinone = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
+  const imageBaseUrl = apiUrl.replace('/api', '') + '/uploads';
   const { token } = useAuthAdminStore();
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
-  const rowsPerPage = 10;
+  const rowsPerPage = 20;
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    featureCategory: true,
-    showOnNavbar: true,
+    image: '',
+    showInHomepage: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -86,7 +90,9 @@ const AdminCategoryAllinone = () => {
   const handleOpenCreate = () => {
     setIsEdit(false);
     setEditId(null);
-    setFormData({ name: '', featureCategory: true, showOnNavbar: true });
+    setFormData({ name: '', image: null, showInHomepage: false });
+    setImagePreview(null);
+    setImageRemoved(false);
     setDialogOpen(true);
   };
 
@@ -95,9 +101,11 @@ const AdminCategoryAllinone = () => {
     setEditId(cat._id);
     setFormData({
       name: cat.name,
-      featureCategory: cat.featureCategory,
-      showOnNavbar: cat.showOnNavbar,
+      image: null,
+      showInHomepage: cat.showInHomepage || false,
     });
+    setImagePreview(cat.image ? `${imageBaseUrl}/${cat.image}` : null);
+    setImageRemoved(false);
     setDialogOpen(true);
   };
 
@@ -108,20 +116,23 @@ const AdminCategoryAllinone = () => {
     }
     setIsSubmitting(true);
     try {
+      const fd = new FormData();
+      fd.append('name', formData.name);
+      fd.append('showInHomepage', formData.showInHomepage);
+      if (formData.image instanceof File) {
+        fd.append('image', formData.image);
+      } else if (imageRemoved && isEdit) {
+        fd.append('removeImage', 'true');
+      }
+
       if (isEdit) {
-        await axios.put(`${apiUrl}/category/${editId}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+        await axios.put(`${apiUrl}/category/${editId}`, fd, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success('Category updated successfully!');
       } else {
-        await axios.post(`${apiUrl}/category`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+        await axios.post(`${apiUrl}/category`, fd, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success('Category added successfully!');
       }
@@ -158,7 +169,7 @@ const AdminCategoryAllinone = () => {
   const filteredCategories = useMemo(() => {
     return categories
       .filter((cat) =>
-        cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        cat?.name?.toLowerCase().includes(searchTerm.toLowerCase()),
       )
       .reverse();
   }, [categories, searchTerm]);
@@ -207,11 +218,11 @@ const AdminCategoryAllinone = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Category Name</TableHead>
-                    <TableHead className="text-center w-[120px]">
-                      Featured
+                    <TableHead className="text-center w-[60px]">
+                      Image
                     </TableHead>
-                    <TableHead className="text-center w-[140px]">
-                      Show on Navbar
+                    <TableHead className="text-center w-[130px]">
+                      Show in Homepage
                     </TableHead>
                     <TableHead className="text-center w-[100px]">
                       Actions
@@ -235,19 +246,25 @@ const AdminCategoryAllinone = () => {
                           {cat.name}
                         </TableCell>
                         <TableCell className="text-center">
-                          <Badge
-                            variant={
-                              cat.featureCategory ? 'default' : 'secondary'
-                            }
-                          >
-                            {cat.featureCategory ? 'Yes' : 'No'}
-                          </Badge>
+                          {cat.image ? (
+                            <img
+                              src={`${imageBaseUrl}/${cat.image}`}
+                              alt=""
+                              className="mx-auto h-8 w-8 rounded object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">
+                              —
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="text-center">
                           <Badge
-                            variant={cat.showOnNavbar ? 'default' : 'secondary'}
+                            variant={
+                              cat.showInHomepage ? 'default' : 'secondary'
+                            }
                           >
-                            {cat.showOnNavbar ? 'Yes' : 'No'}
+                            {cat.showInHomepage ? 'Yes' : 'No'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
@@ -340,47 +357,66 @@ const AdminCategoryAllinone = () => {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Feature Category</label>
-                <Select
-                  value={String(formData.featureCategory)}
-                  onValueChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      featureCategory: value === 'true',
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">Yes</SelectItem>
-                    <SelectItem value="false">No</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Image <span className="text-muted-foreground">(optional)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setFormData({ ...formData, image: file });
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  className="flex-1"
+                />
+                {imagePreview && (
+                  <button
+                    type="button"
+                    className="text-xs text-destructive hover:underline"
+                    onClick={() => {
+                      setFormData({ ...formData, image: null });
+                      setImagePreview(null);
+                      setImageRemoved(true);
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Show on Navbar</label>
-                <Select
-                  value={String(formData.showOnNavbar)}
-                  onValueChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      showOnNavbar: value === 'true',
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">Yes</SelectItem>
-                    <SelectItem value="false">No</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="mt-1 h-20 w-20 object-cover rounded border"
+                />
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Show in Homepage</label>
+              <Select
+                value={String(formData.showInHomepage)}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    showInHomepage: value === 'true',
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
