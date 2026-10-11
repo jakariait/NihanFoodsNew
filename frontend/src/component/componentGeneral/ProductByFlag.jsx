@@ -48,7 +48,7 @@ const ProductByFlag = () => {
     );
 
   return (
-    <div className="xl:container xl:mx-auto p-4 justify-center md:justify-start">
+    <div className="xl:container xl:mx-auto p-4 bg-gray-100 flex flex-col justify-center md:justify-start gap-10 md:gap-14">
       {flags.map((flag) => {
         const products = homeProducts[flag.name] || [];
         if (products.length === 0) return null; // Skip if no products for this flag
@@ -59,29 +59,24 @@ const ProductByFlag = () => {
         const slicedProducts = products.slice(0, 8); // Show max 8
 
         return (
-          <div key={flag._id} className={'mb-5'}>
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-grow h-px bg-gray-400"></div>
-              <h2 className="text-lg pl-10 pr-10 font-bold secondaryTextColor whitespace-nowrap uppercase tracking-widest">
+          <div key={flag._id}>
+            <div className="flex items-center justify-between gap-4 mb-5">
+              <h2 className="border-l-4 primaryBorderColor pl-3 text-lg md:text-xl font-bold secondaryTextColor uppercase tracking-widest">
                 {flag.name}
               </h2>
-              <div className="flex-grow h-px bg-gray-400"></div>
+
+              {products.length > 8 && (
+                <Link
+                  to={viewAllLink}
+                  className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold primaryTextColor accentBgColor hover:opacity-90 transition-opacity"
+                >
+                  View All <FaArrowRight className="text-xs" />
+                </Link>
+              )}
             </div>
 
             {/* ✅ Render once with sliced products */}
             <ProductList products={slicedProducts} />
-            <div className={'flex flex-wrap justify-center mt-5'}>
-              {products.length > 8 && (
-                <Link
-                  to={viewAllLink}
-                  className="primaryTextColor primaryBorderColor border-1 px-4 py-2 rounded"
-                >
-                  <div className="flex gap-6 justify-center items-center">
-                    View All <FaArrowRight />
-                  </div>
-                </Link>
-              )}
-            </div>
           </div>
         );
       })}
