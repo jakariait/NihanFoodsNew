@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MdEmail, MdClose } from 'react-icons/md';
-import { TfiTruck } from 'react-icons/tfi';
+import { MdClose } from 'react-icons/md';
 import { CiShoppingCart, CiHeart } from 'react-icons/ci';
 import { IoPersonOutline } from 'react-icons/io5';
 import { GiHamburgerMenu } from 'react-icons/gi';
@@ -19,6 +18,15 @@ import MobileMenu from './MobileMenu';
 import Cart from './Cart';
 import HeaderSearch from './HeaderSearch.jsx';
 
+const iconBtn =
+  'relative flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400';
+
+const badge =
+  'absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none ring-2 ring-white primaryBgColor accentTextColor';
+
+const avatarBase =
+  'h-10 w-10 rounded-full object-cover flex items-center justify-center ring-2 ring-white shadow-sm transition-transform duration-200 hover:scale-105';
+
 const Headers = () => {
   const navigate = useNavigate();
   const { GeneralInfoList, GeneralInfoListLoading, GeneralInfoListError } =
@@ -31,6 +39,7 @@ const Headers = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
@@ -44,40 +53,25 @@ const Headers = () => {
     cart.reduce((total, item) => total + item.quantity, 0),
   );
 
-  const avatarClass = `
-  w-10 h-10 md:w-12 md:h-12
-  rounded-full object-cover border-2 border-white shadow-md
-  flex items-center justify-center
-  primaryBgColor accentTextColor
-  transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-lg
-`;
-
-  const avatarInitialClass = `
-  w-10 h-10 md:w-12 md:h-12
-  rounded-full object-cover border-2 border-white shadow-md
-  flex items-center justify-center
-  primaryBgColor accentTextColor text-lg font-semibold
-  transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-lg
-`;
-
   useEffect(() => {
     const handleScroll = () => {
-      if (headerMainRef.current) {
-        const headerMainTop = headerMainRef.current.offsetTop;
-        setIsSticky(window.scrollY > headerMainTop);
-      }
+      const shouldStick = window.scrollY > 40;
+      setIsSticky((prev) => {
+        if (shouldStick && !prev && headerMainRef.current) {
+          // keep page content from jumping when the bar leaves the flow
+          setHeaderHeight(headerMainRef.current.offsetHeight);
+        }
+        return shouldStick;
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Close mobile menu
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target) &&
@@ -87,7 +81,6 @@ const Headers = () => {
         setIsMenuOpen(false);
       }
 
-      // Close cart menu
       if (
         cartMenuRef.current &&
         !cartMenuRef.current.contains(event.target) &&
@@ -97,7 +90,6 @@ const Headers = () => {
         setIsCartMenuOpen(false);
       }
 
-      // Close user dropdown
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target) &&
@@ -111,10 +103,7 @@ const Headers = () => {
     if (isMenuOpen || isCartMenuOpen || isDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, isCartMenuOpen, isDropdownOpen]);
 
   useEffect(() => {
@@ -131,10 +120,25 @@ const Headers = () => {
     prevCartCount.current = currentCartCount;
   }, [cart]);
 
+  // Close drawers on Escape
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setIsMenuOpen(false);
+        setIsCartMenuOpen(false);
+        setIsDropdownOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
 
   const handleLogout = () => {
     logout();
+    setIsDropdownOpen(false);
+    setIsMenuOpen(false);
     navigate('/login');
   };
 
@@ -149,35 +153,41 @@ const Headers = () => {
   if (GeneralInfoListLoading) {
     return (
       <div className="xl:container xl:mx-auto p-3">
-        <Skeleton height={40} />
-        <Skeleton height={60} />
-        <Skeleton height={40} />
+        <Skeleton height={56} borderRadius={16} />
       </div>
     );
   }
 
   return (
     <div>
-      {/* Header Main */}
+      {/* Spacer keeps layout steady while the bar is fixed */}
+      {isSticky && <div style={{ height: headerHeight }} aria-hidden="true" />}
+
+      {/* Header main: floating pill */}
       <div
         ref={headerMainRef}
-        className={`border-b border-gray-200 md:px-3 bg-white ${
-          isSticky ? 'fixed top-0 left-0 right-0 z-40 ' : ''
+        className={`w-full ${
+          isSticky ? 'fixed top-0 left-0 right-0 z-40' : ''
         }`}
       >
-        <div className="xl:container xl:mx-auto py-3 px-3 flex gap-6 items-center justify-between">
-          <div
+        <div
+          className={`flex w-full items-center gap-2 md:gap-4 border-b border-gray-200 bg-white/90 px-3 py-3 md:px-6 lg:px-10 backdrop-blur-md transition-shadow duration-300 ${
+            isSticky ? 'shadow-md' : ''
+          }`}
+        >
+          {/* Hamburger */}
+          <button
             ref={hamburgerRef}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-2xl cursor-pointer lg:hidden"
-            role="button"
+            onClick={() => setIsMenuOpen((p) => !p)}
+            className={`${iconBtn} lg:hidden`}
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
-            <GiHamburgerMenu />
-          </div>
+            <GiHamburgerMenu className="text-xl" />
+          </button>
 
-          <Link to="/">
+          {/* Logo */}
+          <Link to="/" className="shrink-0" aria-label="Home">
             <ImageComponent
               imageName={GeneralInfoList?.PrimaryLogo}
               className="w-30 h-10"
@@ -186,57 +196,39 @@ const Headers = () => {
             />
           </Link>
 
-          <HeaderSearch />
+          {/* Search */}
+          <div className="min-w-0 flex-1 md:mx-4 lg:mx-8">
+            <HeaderSearch />
+          </div>
 
-          {/* Right Icons */}
-          <div className="flex items-center justify-center gap-2 relative">
-            {/* Wishlist */}
-            <Link
-              to="/user/wishlist"
-              className="relative flex flex-col justify-center items-center"
-              aria-label="Wishlist"
-            >
-              <CiHeart className="w-7 h-7 cursor-pointer" />
-              <span className="text-sm hidden lg:block pt-1">Wishlist</span>
+          {/* Actions */}
+          <div className="ml-auto flex shrink-0 items-center gap-1 md:gap-2">
+            <Link to="/user/wishlist" className={iconBtn} aria-label="Wishlist">
+              <CiHeart className="h-7 w-7" />
               {wishlist.length > 0 && (
-                <span className="absolute top-0 right-0 -mt-2 -mr-2 md:mr-0 primaryBgColor rounded-full h-6 w-6 flex items-center justify-center text-xs accentTextColor">
-                  {wishlist.length}
-                </span>
+                <span className={badge}>{wishlist.length}</span>
               )}
             </Link>
 
-            {/* Cart */}
-            <div
+            <button
               ref={cartButtonRef}
-              onClick={() => setIsCartMenuOpen(!isCartMenuOpen)}
-              className="relative"
-              role="button"
+              onClick={() => setIsCartMenuOpen((p) => !p)}
+              className={iconBtn}
               aria-label="Shopping cart"
               aria-expanded={isCartMenuOpen}
             >
-              <div className={'flex flex-col justify-center items-center'}>
-                {/* Shopping Cart Icon */}
-                <CiShoppingCart className="w-7 h-7 cursor-pointer" />
-
-                {/* Text for My Cart */}
-                <span className="text-sm hidden lg:block pt-1">My Cart</span>
-              </div>
-
-              {/* Cart Quantity Badge */}
+              <CiShoppingCart className="h-7 w-7" />
               {totalQuantity > 0 && (
-                <span className="absolute top-0 right-0 -mt-2 -mr-2 md:mr-0 primaryBgColor rounded-full h-6 w-6 flex items-center justify-center text-xs accentTextColor">
-                  {totalQuantity}
-                </span>
+                <span className={badge}>{totalQuantity}</span>
               )}
-            </div>
+            </button>
 
-            {/* User / Dropdown */}
             {user ? (
-              <div className="relative">
+              <div className="relative ml-1">
                 <button
                   ref={buttonRef}
                   onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className="flex items-center gap-2 cursor-pointer"
+                  className="flex items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
                   aria-label="User menu"
                   aria-expanded={isDropdownOpen}
                 >
@@ -245,10 +237,12 @@ const Headers = () => {
                   user.userImage.trim() !== '' ? (
                     <ImageComponent
                       imageName={user.userImage}
-                      className={avatarClass}
+                      className={`${avatarBase} primaryBgColor accentTextColor`}
                     />
                   ) : (
-                    <span className={avatarInitialClass}>
+                    <span
+                      className={`${avatarBase} primaryBgColor accentTextColor text-base font-semibold`}
+                    >
                       {(user?.fullName &&
                         user.fullName.trim().charAt(0).toUpperCase()) ||
                         'U'}
@@ -259,38 +253,47 @@ const Headers = () => {
                 {isDropdownOpen && (
                   <div
                     ref={dropdownRef}
-                    className="absolute z-50 top-full right-0 mt-3 bg-white shadow-xl rounded-lg p-3 min-w-[180px] animate-fadeIn"
+                    className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5 animate-fadeIn"
                   >
-                    <div className="flex flex-col items-center gap-2">
-                      <button className="primaryBgColor px-4 py-2 rounded-lg w-full accentTextColor cursor-pointer hover:opacity-90 transition-opacity">
-                        <Link
-                          to="/user/home"
-                          className={'flex items-center justify-center gap-2'}
-                        >
-                          <IoPersonOutline className="w-5 h-5" />
-                          <span className="text-sm">My Account</span>
-                        </Link>
-                      </button>
+                    <div className="border-b border-gray-100 px-4 py-3">
+                      <p className="truncate text-sm font-semibold text-gray-900">
+                        {user?.fullName || 'My account'}
+                      </p>
+                      {user?.email && (
+                        <p className="truncate text-xs text-gray-500">
+                          {user.email}
+                        </p>
+                      )}
+                    </div>
+                    <div className="p-2">
+                      <Link
+                        to="/user/home"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
+                      >
+                        <IoPersonOutline className="h-5 w-5" />
+                        My Account
+                      </Link>
                       <button
                         onClick={handleLogout}
-                        className="bg-red-500 w-full text-white px-4 py-2 cursor-pointer rounded-lg flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
                         aria-label="Log out"
                       >
-                        <IoIosLogOut className="text-xl" aria-hidden="true" />
-                        <span>Log Out</span>
+                        <IoIosLogOut className="h-5 w-5" aria-hidden="true" />
+                        Log Out
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Link to="/login" aria-label="Login or register">
-                <div className="flex items-center gap-2 flex-col">
-                  <IoPersonOutline className="w-6 h-6" aria-hidden="true" />
-                  <span className="text-sm hidden lg:block">
-                    Login / Register
-                  </span>
-                </div>
+              <Link
+                to="/login"
+                aria-label="Login or register"
+                className="ml-1 flex h-10 items-center gap-2 rounded-full px-3 text-sm font-medium primaryBgColor accentTextColor transition-opacity hover:opacity-90"
+              >
+                <IoPersonOutline className="h-5 w-5" aria-hidden="true" />
+                <span className="hidden md:inline">Login</span>
               </Link>
             )}
           </div>
@@ -306,101 +309,99 @@ const Headers = () => {
         }`}
       >
         <div
-          className="absolute inset-0 bg-opacity-50"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={() => setIsMenuOpen(false)}
         />
         <div
           ref={menuRef}
-          className="relative bg-white w-64 h-full shadow-lg transform transition-transform"
+          className="relative flex h-full w-72 max-w-[85%] flex-col rounded-r-md bg-white shadow-2xl transition-transform duration-300 ease-out"
           style={{
             transform: isMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
           }}
         >
-          <div className="p-4">
-            <div className="flex items-center justify-between">
-              <Link to="/" aria-label="Home">
-                <ImageComponent
-                  imageName={GeneralInfoList?.PrimaryLogo}
-                  className="w-30"
-                  altName={GeneralInfoList?.CompanyName}
-                />
-              </Link>
+          <div className="flex items-center justify-between border-b border-gray-100 p-4">
+            <Link to="/" aria-label="Home" onClick={() => setIsMenuOpen(false)}>
+              <ImageComponent
+                imageName={GeneralInfoList?.PrimaryLogo}
+                className="w-30"
+                altName={GeneralInfoList?.CompanyName}
+              />
+            </Link>
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className={iconBtn}
+              aria-label="Close menu"
+            >
+              <MdClose className="text-2xl" />
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-2 overflow-y-auto p-4">
+            <MobileMenu />
+          </div>
+
+          <div className="border-t border-gray-100 p-4">
+            {user ? (
               <button
-                onClick={() => setIsMenuOpen(false)}
-                aria-label="Close menu"
+                onClick={handleLogout}
+                className="flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 primaryBgColor accentTextColor"
+                aria-label="Log out"
               >
-                <MdClose className="text-3xl" />
+                <IoIosLogOut className="text-xl" aria-hidden="true" />
+                Log Out
               </button>
-            </div>
-            <div className="space-y-2">
-              <MobileMenu />
-            </div>
-            <div className="mt-4">
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="primaryBgColor accentTextColor px-4 py-2 rounded-lg w-full"
-                  aria-label="Log out"
-                >
-                  Log Out
-                </button>
-              ) : (
-                <Link to="/login" aria-label="Login or register">
-                  <div className="inline-flex items-center gap-3">
-                    <IoPersonOutline
-                      className="w-10 h-10 primaryBgColor rounded-full text-white p-2"
-                      aria-hidden="true"
-                    />
-                    <span className="text-sm">Login / Register</span>
-                  </div>
-                </Link>
-              )}
-            </div>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="Login or register"
+                className="flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 primaryBgColor accentTextColor"
+              >
+                <IoPersonOutline className="h-5 w-5" aria-hidden="true" />
+                Login / Register
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Cart Menu */}
+      {/* Cart Drawer */}
       <div
-        className={`fixed inset-0 z-50 ß transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${
           isCartMenuOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         }`}
       >
-        {/* Background Overlay */}
         <div
-          className="absolute inset-0 bg-opacity-50"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={() => setIsCartMenuOpen(false)}
         />
-
-        {/* Slide-In Cart from Right */}
         <div
           ref={cartMenuRef}
-          className="fixed top-0 right-0 h-full w-[350px] bg-white shadow-lg transition-transform duration-300 ease-in-out"
+          className="fixed right-0 top-0 flex h-full w-[360px] max-w-full flex-col rounded-l-md bg-white shadow-2xl transition-transform duration-300 ease-out"
           style={{
             transform: isCartMenuOpen ? 'translateX(0)' : 'translateX(100%)',
           }}
         >
-          <div className="p-4 h-full flex flex-col">
-            <div className="flex items-center justify-between text-lg mb-4">
-              <h1>Your Cart</h1>
-              <h1>
-                {totalQuantity} {totalQuantity <= 1 ? 'item' : 'items'}
-              </h1>
-              <button
-                onClick={() => setIsCartMenuOpen(false)}
-                className={'cursor-pointer'}
-                aria-label="Close cart"
-              >
-                <MdClose className="text-2xl" />
-              </button>
+          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-lg font-semibold text-gray-900">Your cart</h2>
+              <span className="text-sm text-gray-500">
+                {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'}
+              </span>
             </div>
+            <button
+              onClick={() => setIsCartMenuOpen(false)}
+              className={iconBtn}
+              aria-label="Close cart"
+            >
+              <MdClose className="text-2xl" />
+            </button>
+          </div>
 
-            {/* Cart Items Scrollable Section */}
-            <div className="flex-1 overflow-y-auto space-y-2">
-              <Cart onCloseCartMenu={() => setIsCartMenuOpen(false)} />
-            </div>
+          <div className="flex-1 space-y-2 overflow-y-auto p-4">
+            <Cart onCloseCartMenu={() => setIsCartMenuOpen(false)} />
           </div>
         </div>
       </div>

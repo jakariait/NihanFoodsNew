@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CiSearch } from 'react-icons/ci';
+import { MdClose } from 'react-icons/md';
 
 const HeaderSearch = () => {
   const navigate = useNavigate();
@@ -8,56 +9,52 @@ const HeaderSearch = () => {
   const [searchInput, setSearchInput] = useState(
     searchParams.get('search') || '',
   );
-  const searchTimeoutRef = useRef(null);
 
   const handleSearch = () => {
-    if (searchInput.trim()) {
-      // Navigate to products page with search parameter
-      navigate(`/shop?search=${encodeURIComponent(searchInput.trim())}&page=1`);
+    const term = searchInput.trim();
+    if (term) {
+      navigate(`/shop?search=${encodeURIComponent(term)}&page=1`);
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchInput(value);
-
-    // Optional: Auto-search with debounce (uncomment if you want live search)
-    /*
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    searchTimeoutRef.current = setTimeout(() => {
-      if (value.trim()) {
-        navigate(`/products?search=${encodeURIComponent(value.trim())}&page=1`);
-      }
-    }, 1000); // 1 second debounce for auto-search
-    */
-  };
-
   return (
-    <div className="flex-1 max-w-xl hidden lg:flex">
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={searchInput}
-        onChange={handleInputChange}
-        onKeyPress={handleKeyPress}
-        className="px-3 py-2 w-full outline-none text-gray-700 border border-gray-200 rounded-l "
-      />
-      <button
-        onClick={handleSearch}
-        className="primaryBgColor p-3 rounded-r hover:opacity-90 transition-opacity"
-        aria-label="Search"
-      >
-        <CiSearch className="text-white w-5 h-5" />
-      </button>
+    <div className="hidden lg:flex items-center w-full max-w-md">
+      <div className="group relative flex items-center w-full rounded-full border border-gray-200 bg-gray-50 transition-all duration-300 hover:border-gray-300 hover:bg-white focus-within:bg-white focus-within:border-[var(--primaryColor)] focus-within:ring-4 focus-within:ring-[var(--primaryColor)]/10">
+        <CiSearch className="absolute left-4 w-4 h-4 text-gray-400 transition-colors group-focus-within:text-[var(--primaryColor)]" />
+
+        <input
+          type="text"
+          placeholder="Search for products..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          aria-label="Search products"
+          className="w-full bg-transparent py-2.5 pl-11 pr-24 text-sm text-gray-800 placeholder:text-gray-400 outline-none"
+        />
+
+        {searchInput && (
+          <button
+            onClick={() => setSearchInput('')}
+            className="absolute right-[5.5rem] cursor-pointer text-gray-400 hover:text-gray-700 transition-colors"
+            aria-label="Clear search"
+          >
+            <MdClose className="w-4 h-4" />
+          </button>
+        )}
+
+        <button
+          onClick={handleSearch}
+          className="primaryBgColor accentTextColor absolute right-1 top-1/2 -translate-y-1/2 h-9 px-4 rounded-full text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity"
+        >
+          Search
+        </button>
+      </div>
     </div>
   );
 };
