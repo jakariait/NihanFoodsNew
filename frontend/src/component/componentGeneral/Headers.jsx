@@ -204,7 +204,7 @@ const Headers = () => {
               }`}
             >
               <div
-                className={`flex w-full items-center gap-2 md:gap-4 border-b border-gray-200 bg-white/90 px-3 py-3 md:px-6 lg:px-10 backdrop-blur-md transition-shadow duration-300 ${
+                className={`relative flex w-full items-center gap-2 md:gap-4 border-b border-gray-200 bg-white/90 px-3 py-3 md:px-6 lg:px-10 backdrop-blur-md transition-shadow duration-300 ${
                   isSticky ? 'shadow-md' : ''
                 }`}
               >
@@ -222,8 +222,12 @@ const Headers = () => {
                   <GiHamburgerMenu className="text-xl" />
                 </button>
 
-                {/* Logo */}
-                <Link to="/" className="shrink-0" aria-label="Home">
+                {/* Logo — centered on mobile, back in flow on desktop */}
+                <Link
+                  to="/"
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 lg:static lg:translate-x-0 lg:translate-y-0"
+                  aria-label="Home"
+                >
                   <ImageComponent
                     imageName={GeneralInfoList?.PrimaryLogo}
                     className="w-30 h-10"
