@@ -8,7 +8,7 @@ import BottomFooterPromo from '#component/componentGeneral/BottomFooterPromo.jsx
 
 const Layout = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen pb-[calc(68px_+_env(safe-area-inset-bottom))] lg:pb-0">
       <MarqueeModern />
       <Headers />
       <Toaster position="top-right" />
