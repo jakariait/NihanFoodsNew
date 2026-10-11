@@ -185,7 +185,7 @@ const Headers = () => {
               first). On desktop it stays in flow until scrolled, then fixed.
               Only the bar lives here: position:sticky creates a stacking
               context, and the drawers below need their z-50 free. */}
-          <div className="sticky top-0 z-40 lg:static lg:z-auto">
+          <div className=" sticky top-0 z-40 lg:static lg:z-auto">
             {/* Desktop: spacer keeps layout steady while the bar is fixed on scroll */}
             {isSticky && (
               <div
@@ -204,149 +204,159 @@ const Headers = () => {
               }`}
             >
               <div
-                className={`relative flex w-full items-center gap-2 md:gap-4 border-b border-gray-200 bg-white/90 px-3 py-3 md:px-6 lg:px-10 backdrop-blur-md transition-shadow duration-300 ${
-                  isSticky ? 'shadow-md' : ''
+                className={`relative w-full border-b border-gray-200 bg-white/90 backdrop-blur-md transition-shadow duration-300
                 }`}
               >
-                {/* Hamburger */}
-                <button
-                  ref={hamburgerRef}
-                  onClick={() => {
-                    setIsMenuOpen((p) => !p);
-                    setIsMobileSearchOpen(false);
-                  }}
-                  className={`${iconBtn} lg:hidden`}
-                  aria-label="Toggle menu"
-                  aria-expanded={isMenuOpen}
-                >
-                  <GiHamburgerMenu className="text-xl" />
-                </button>
-
-                {/* Logo — centered on mobile, back in flow on desktop */}
-                <Link
-                  to="/"
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 lg:static lg:translate-x-0 lg:translate-y-0"
-                  aria-label="Home"
-                >
-                  <ImageComponent
-                    imageName={GeneralInfoList?.PrimaryLogo}
-                    className="w-30 h-10"
-                    altName={GeneralInfoList?.CompanyName}
-                    skeletonHeight={'10'}
-                  />
-                </Link>
-
-                {/* Search — desktop only, mobile uses the bottom bar trigger */}
-                <div className="flex min-w-0 flex-1 items-center md:mx-4 lg:mx-8">
-                  <HeaderSearch />
-                </div>
-
-                {/* Actions */}
-                <div className="ml-auto flex shrink-0 items-center gap-1 md:gap-2">
-                  <Link
-                    to="/user/wishlist"
-                    className={`${iconBtn} hidden lg:flex`}
-                    aria-label="Wishlist"
-                  >
-                    <CiHeart className="h-7 w-7" />
-                    {wishlist.length > 0 && (
-                      <span className={badge}>{wishlist.length}</span>
-                    )}
-                  </Link>
-
+                <div className="relative flex w-full items-center gap-2 px-3 py-3 md:gap-4  xl:container xl:mx-auto">
+                  {/* Hamburger */}
                   <button
-                    ref={cartButtonRef}
+                    ref={hamburgerRef}
                     onClick={() => {
-                      setIsCartMenuOpen((p) => !p);
+                      setIsMenuOpen((p) => !p);
                       setIsMobileSearchOpen(false);
                     }}
-                    className={iconBtn}
-                    aria-label="Shopping cart"
-                    aria-expanded={isCartMenuOpen}
+                    className={`${iconBtn} lg:hidden`}
+                    aria-label="Toggle menu"
+                    aria-expanded={isMenuOpen}
                   >
-                    <CiShoppingCart className="h-7 w-7" />
-                    {totalQuantity > 0 && (
-                      <span className={badge}>{totalQuantity}</span>
-                    )}
+                    <GiHamburgerMenu className="text-xl" />
                   </button>
 
-                  {user ? (
-                    <div className="relative ml-1 hidden lg:block">
-                      <button
-                        ref={buttonRef}
-                        onClick={() => setIsDropdownOpen((prev) => !prev)}
-                        className="flex items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
-                        aria-label="User menu"
-                        aria-expanded={isDropdownOpen}
-                      >
-                        {user?.userImage &&
-                        typeof user.userImage === 'string' &&
-                        user.userImage.trim() !== '' ? (
-                          <ImageComponent
-                            imageName={user.userImage}
-                            className={`${avatarBase} primaryBgColor accentTextColor`}
-                          />
-                        ) : (
-                          <span
-                            className={`${avatarBase} primaryBgColor accentTextColor text-base font-semibold`}
-                          >
-                            {(user?.fullName &&
-                              user.fullName.trim().charAt(0).toUpperCase()) ||
-                              'U'}
-                          </span>
-                        )}
-                      </button>
+                  {/* Logo — centered on mobile, back in flow on desktop */}
+                  <Link
+                    to="/"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 lg:static lg:translate-x-0 lg:translate-y-0"
+                    aria-label="Home"
+                  >
+                    <ImageComponent
+                      imageName={GeneralInfoList?.PrimaryLogo}
+                      className="w-30 h-10"
+                      altName={GeneralInfoList?.CompanyName}
+                      skeletonHeight={'10'}
+                    />
+                  </Link>
 
-                      {isDropdownOpen && (
-                        <div
-                          ref={dropdownRef}
-                          className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5 animate-fadeIn"
-                        >
-                          <div className="border-b border-gray-100 px-4 py-3">
-                            <p className="truncate text-sm font-semibold text-gray-900">
-                              {user?.fullName || 'My account'}
-                            </p>
-                            {user?.email && (
-                              <p className="truncate text-xs text-gray-500">
-                                {user.email}
-                              </p>
-                            )}
-                          </div>
-                          <div className="p-2">
-                            <Link
-                              to="/user/home"
-                              onClick={() => setIsDropdownOpen(false)}
-                              className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
-                            >
-                              <IoPersonOutline className="h-5 w-5" />
-                              My Account
-                            </Link>
-                            <button
-                              onClick={handleLogout}
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
-                              aria-label="Log out"
-                            >
-                              <IoIosLogOut
-                                className="h-5 w-5"
-                                aria-hidden="true"
-                              />
-                              Log Out
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
+                  {/* Search — desktop only, mobile uses the bottom bar trigger */}
+                  <div className="flex min-w-0 flex-1 items-center md:mx-4 lg:mx-8">
+                    <HeaderSearch />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="ml-auto flex shrink-0 items-center gap-1 md:gap-2">
                     <Link
-                      to="/login"
-                      aria-label="Login or register"
-                      className="ml-1 hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-medium primaryBgColor accentTextColor transition-opacity hover:opacity-90 lg:flex"
+                      to="/user/wishlist"
+                      className={`${iconBtn} hidden lg:flex`}
+                      aria-label="Wishlist"
                     >
-                      <IoPersonOutline className="h-5 w-5" aria-hidden="true" />
-                      <span className="hidden md:inline">Login</span>
+                      <CiHeart className="h-7 w-7" />
+                      {wishlist.length > 0 && (
+                        <span className={badge}>{wishlist.length}</span>
+                      )}
                     </Link>
-                  )}
+
+                    <button
+                      ref={cartButtonRef}
+                      onClick={() => {
+                        setIsCartMenuOpen((p) => !p);
+                        setIsMobileSearchOpen(false);
+                      }}
+                      className={iconBtn}
+                      aria-label="Shopping cart"
+                      aria-expanded={isCartMenuOpen}
+                    >
+                      <CiShoppingCart className="h-7 w-7" />
+                      {totalQuantity > 0 && (
+                        <span className={badge}>{totalQuantity}</span>
+                      )}
+                    </button>
+
+                    {user ? (
+                      <div className="relative ml-1 hidden lg:block">
+                        <button
+                          ref={buttonRef}
+                          onClick={() => setIsDropdownOpen((prev) => !prev)}
+                          className="flex items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                          aria-label="User menu"
+                          aria-expanded={isDropdownOpen}
+                        >
+                          {user?.userImage &&
+                          typeof user.userImage === 'string' &&
+                          user.userImage.trim() !== '' ? (
+                            <ImageComponent
+                              imageName={user.userImage}
+                              className={`${avatarBase} primaryBgColor accentTextColor`}
+                            />
+                          ) : (
+                            <span
+                              className={`${avatarBase} primaryBgColor accentTextColor text-base font-semibold`}
+                            >
+                              {(user?.fullName &&
+                                user.fullName.trim().charAt(0).toUpperCase()) ||
+                                'U'}
+                            </span>
+                          )}
+                        </button>
+
+                        {isDropdownOpen && (
+                          <div
+                            ref={dropdownRef}
+                            className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5 animate-fadeIn"
+                          >
+                            <div className="border-b border-gray-100 px-4 py-3">
+                              <p className="truncate text-sm font-semibold text-gray-900">
+                                {user?.fullName || 'My account'}
+                              </p>
+                              {user?.email && (
+                                <p className="truncate text-xs text-gray-500">
+                                  {user.email}
+                                </p>
+                              )}
+                            </div>
+                            <div className="p-2">
+                              <Link
+                                to="/user/home"
+                                onClick={() => setIsDropdownOpen(false)}
+                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
+                              >
+                                <IoPersonOutline className="h-5 w-5" />
+                                My Account
+                              </Link>
+                              <button
+                                onClick={handleLogout}
+                                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
+                                aria-label="Log out"
+                              >
+                                <IoIosLogOut
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
+                                Log Out
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        to="/login"
+                        aria-label="Login or register"
+                        className="ml-1 hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-medium primaryBgColor accentTextColor transition-opacity hover:opacity-90 lg:flex"
+                      >
+                        <IoPersonOutline
+                          className="h-5 w-5"
+                          aria-hidden="true"
+                        />
+                        <span className="hidden md:inline">Login</span>
+                      </Link>
+                    )}
+                  </div>
                 </div>
+              </div>
+
+              {/* MenuBar (Desktop) — lives inside the header container so it
+                  is fixed together with the bar on scroll */}
+              <div className="hidden lg:block">
+                <MenuBar />
               </div>
             </div>
           </div>
@@ -463,11 +473,6 @@ const Headers = () => {
                 <Cart onCloseCartMenu={() => setIsCartMenuOpen(false)} />
               </div>
             </div>
-          </div>
-
-          {/* MenuBar (Desktop) */}
-          <div className="hidden lg:block">
-            <MenuBar />
           </div>
         </>
       )}

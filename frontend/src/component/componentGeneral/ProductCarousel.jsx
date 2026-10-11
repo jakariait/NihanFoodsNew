@@ -91,7 +91,7 @@ const ProductCarousel = () => {
     ); // Display error message
   }
   return (
-    <div className="product-carousel xl:container xl:mx-auto pb-4 relative">
+    <div className="product-carousel xl:container xl:mx-auto  relative">
       {CarouselStoreListLoading ? (
         <>
           <Skeleton height={400} width={'100%'} />
@@ -100,7 +100,11 @@ const ProductCarousel = () => {
         <>
           <Slider ref={sliderRef} {...settings}>
             {products.map((product, index) => (
-              <Slide key={product._id || index} product={product} index={index} />
+              <Slide
+                key={product._id || index}
+                product={product}
+                index={index}
+              />
             ))}
           </Slider>
         </>
