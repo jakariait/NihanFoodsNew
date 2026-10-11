@@ -1,4 +1,5 @@
 const ChildCategory = require('../models/ChildCategoryModel');
+const { attachProductCounts } = require('./productCountService');
 const fs = require('fs');
 const path = require('path');
 
@@ -33,7 +34,7 @@ const getAllChildCategories = async (filter = {}) => {
       .populate('subCategory', 'name')
       .select('-createdAt -updatedAt')
       .exec();
-    return childCategories;
+    return await attachProductCounts(childCategories, 'childCategory');
   } catch (error) {
     throw new Error('Error fetching child categories: ' + error.message);
   }

@@ -1,4 +1,5 @@
 const CategoryModel = require('../models/CategoryModel');
+const { attachProductCounts } = require('./productCountService');
 
 const createCategory = async (categoryData) => {
   const category = new CategoryModel(categoryData);
@@ -6,7 +7,8 @@ const createCategory = async (categoryData) => {
 };
 
 const getCategories = async (filter = {}) => {
-  return await CategoryModel.find(filter);
+  const categories = await CategoryModel.find(filter);
+  return await attachProductCounts(categories, 'category');
 };
 
 const getCategoryById = async (id) => {

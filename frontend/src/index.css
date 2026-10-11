@@ -143,6 +143,17 @@
 .primaryTextColor {
   color: var(--primaryColor);
 }
+.primaryTextGradient {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--primaryColor) 80%, var(--secondaryColor)) 0%,
+    var(--primaryColor) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 .secondaryTextColor {
   color: var(--secondaryColor);
 }

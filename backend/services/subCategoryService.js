@@ -1,5 +1,6 @@
 const SubCategory = require('../models/SubCategoryModel');
 const CounterModel = require('../models/CategoryCounterModel');
+const { attachProductCounts } = require('./productCountService');
 const slugify = require('slugify');
 const fs = require('fs');
 const path = require('path');
@@ -37,9 +38,10 @@ const createSubCategory = async (subCategoryData) => {
 // Get all subcategories
 const getAllSubCategories = async (filter = {}) => {
   try {
-    return await SubCategory.find(filter)
+    const subCategories = await SubCategory.find(filter)
       .populate('category', 'name')
       .select('-createdAt -updatedAt');
+    return await attachProductCounts(subCategories, 'subCategory');
   } catch (error) {
     throw new Error('Error fetching subcategories: ' + error.message);
   }

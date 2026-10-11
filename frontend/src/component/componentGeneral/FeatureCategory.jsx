@@ -1,16 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowRight,
+  Plus,
+  Minus,
+} from 'lucide-react';
 import ImageComponent from './ImageComponent.jsx';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const FeatureCategory = () => {
+const MOBILE_VISIBLE = 6;
+
+const arrowBtn =
+  'absolute top-1/2 -translate-y-1/2 z-20 size-10 md:size-11 flex items-center justify-center rounded-full bg-white text-[var(--primaryColor)] border border-gray-200 shadow-[0_6px_20px_-6px_rgba(0,0,0,0.25)] transition-all duration-200 hover:primaryBgColor hover:text-white hover:border-transparent hover:shadow-lg active:scale-95 disabled:opacity-0 disabled:pointer-events-none';
+
+const ShopByCategory = () => {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [childCategories, setChildCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMore, setShowMore] = useState(false);
+
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,71 +78,215 @@ const FeatureCategory = () => {
     })),
   ];
 
+  const updateArrows = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    updateArrows();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    return () => {
+      el.removeEventListener('scroll', updateArrows);
+      window.removeEventListener('resize', updateArrows);
+    };
+  }, [updateArrows, loading, allItems.length]);
+
+  const scrollByAmount = (dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
+  };
+
   if (!loading && allItems.length === 0) return null;
 
+  const visibleItems = showMore ? allItems : allItems.slice(0, MOBILE_VISIBLE);
+  const hasMore = allItems.length > MOBILE_VISIBLE;
+
+  const cardClass =
+    'group relative flex h-full flex-col items-center justify-center overflow-hidden rounded-2xl border border-gray-200/80 bg-gray-100 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[0_18px_35px_-15px_rgba(0,57,93,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primaryColor)]/40';
+
+  const renderItem = (item, i) => (
+    <Link
+      key={`${item._id || i}`}
+      to={item.link}
+      className={cardClass}
+      aria-label={item.name}
+    >
+      <span className="pointer-events-none absolute inset-0 z-20 rounded-2xl opacity-0 ring-1 ring-inset ring-[var(--primaryColor)]/25 transition-opacity duration-300 group-hover:opacity-100" />
+
+      <div className="relative w-full overflow-hidden">
+        <div className=" w-full">
+          <ImageComponent
+            imageName={item.image}
+            className="h-full w-full object-contain px-4 transition-transform duration-500 ease-out group-hover:scale-110"
+            altName={item.name}
+            skeletonHeight={130}
+          />
+        </div>
+      </div>
+
+{/* name sits flush under the image — no separator, no own background */}
+      <div className="flex w-full flex-1 flex-col items-center justify-center gap-0.5 px-2 py-2 text-center">
+        <h3 className="line-clamp-2 font-medium leading-snug text-gray-800 transition-colors duration-300 group-hover:primaryTextColor">
+          {item.name}
+        </h3>
+        <span className="text-xs font-medium text-gray-500 transition-colors duration-300 group-hover:text-[var(--primaryColor)]">
+          {item.productsCount || 0} {item.productsCount === 1 ? 'item' : 'items'}
+        </span>
+      </div>
+    </Link>
+  );
+
+  const shopAllCard = (
+    <Link
+      to="/shop"
+      className="group relative flex h-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl primaryBgGradient p-4 text-center text-white shadow-[0_18px_35px_-18px_rgba(0,57,93,0.7)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_45px_-18px_rgba(0,57,93,0.85)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primaryColor)]/40"
+    >
+      <span className="absolute -right-6 -top-6 size-20 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-150" />
+      <span className="absolute -bottom-8 -left-4 size-24 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-150" />
+      <span className="relative flex size-12 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25 transition-transform duration-300 group-hover:scale-110">
+        <ArrowRight size={22} />
+      </span>
+      <span className="relative text-sm font-semibold tracking-wide">
+        Shop All
+      </span>
+    </Link>
+  );
+
+  const skeletonCard = (i) => (
+    <div
+      key={i}
+      className="overflow-hidden rounded-2xl border border-gray-200/80 bg-gray-100 shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
+    >
+      <Skeleton height={110} />
+      <div className="space-y-2 p-3">
+        <Skeleton height={12} width="80%" />
+        <Skeleton height={10} width="40%" />
+      </div>
+    </div>
+  );
+
   return (
-    <section className="bg-gray-50 py-10">
+    <section className="bg-gray-50 py-8 md:py-12">
       <div className="xl:container xl:mx-auto px-4">
-        <div className="text-center mb-8 border-b border-gray-200 pb-4">
-          <h2 className="text-[28px] md:text-[34px]  primaryTextColor leading-tight tracking-tight">
-            Featured Category
+        {/* Heading */}
+        <div className="mb-6 md:mb-7">
+          <h2 className="text-[24px] md:text-[32px] primaryTextGradient leading-tight tracking-tight">
+            Shop by Category
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Explore the best products from our Featured Category! Shop now at MM
-            Computer.
-          </p>
+          <div className="mt-3 h-1 w-12 rounded-full bg-[var(--tertiaryColor)]" />
         </div>
 
-        {loading ? (
-          <div className="flex flex-wrap justify-center gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="w-[calc(25%-0.75rem)] md:w-[calc(16.666%-0.833rem)] lg:w-[calc(12.5%-0.875rem)] rounded-md overflow-hidden bg-white border border-gray-200"
+        {/* MOBILE — grid with Show More / Show Less */}
+        <div className="md:hidden">
+          {loading ? (
+            <div className="grid grid-cols-3 gap-3">
+              {Array.from({ length: 6 }).map((_, i) => skeletonCard(i))}
+            </div>
+          ) : (
+            <>
+              <motion.div
+                layout
+                className="grid grid-cols-3 gap-3"
+                transition={{ layout: { duration: 0.35, ease: 'easeOut' } }}
               >
-                <Skeleton height={160} />
-                <div className="p-3">
-                  <Skeleton height={16} width="70%" />
+                <AnimatePresence mode="popLayout">
+                  {visibleItems.map((item, i) => (
+                    <motion.div
+                      key={`${item._id || i}`}
+                      layout
+                      initial={{ opacity: 0, scale: 0.92 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.92 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="min-w-0"
+                    >
+                      {renderItem(item, i)}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+
+              {hasMore && (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowMore((v) => !v)}
+                    className="inline-flex items-center gap-2 rounded-full border border-[var(--primaryColor)]/25 bg-white px-6 py-2.5 text-sm font-semibold text-[var(--primaryColor)] shadow-sm transition-all duration-200 hover:primaryBgColor hover:text-white active:scale-95"
+                  >
+                    {showMore ? (
+                      <>
+                        <Minus size={16} /> Show Less
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={16} /> Show More
+                      </>
+                    )}
+                  </button>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex  flex-wrap justify-center gap-4 ">
-            {allItems.map((item, i) =>
-              !item ? null : (
-                <Link
-                  key={`${item._id || i}`}
-                  to={item.link}
-                  className="w-[calc(25%-0.75rem)] md:w-[calc(10.666%-0.833rem)] lg:w-[calc(9.5%-0.875rem)] group relative bg-white rounded-md border border-gray-200 overflow-hidden transition-colors duration-200 hover:border-[var(--primaryColor)]/40"
-                >
-                  <span className="pointer-events-none absolute top-1.5 left-1.5 w-3 h-3 border-t-2 border-l-2 border-[var(--primaryColor)] opacity-0 -translate-x-1 -translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-200 z-10" />
-                  <span className="pointer-events-none absolute top-1.5 right-1.5 w-3 h-3 border-t-2 border-r-2 border-[var(--primaryColor)] opacity-0 translate-x-1 -translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-200 z-10" />
-                  <span className="pointer-events-none absolute bottom-1.5 left-1.5 w-3 h-3 border-b-2 border-l-2 border-[var(--primaryColor)] opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-200 z-10" />
-                  <span className="pointer-events-none absolute bottom-1.5 right-1.5 w-3 h-3 border-b-2 border-r-2 border-[var(--primaryColor)] opacity-0 translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-200 z-10" />
+              )}
+            </>
+          )}
+        </div>
 
-                  <div className=" bg-gray-100 overflow-hidden">
-                    <ImageComponent
-                      imageName={item.image}
-                      className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-300 p-5"
-                      altName=""
-                      skeletonHeight={160}
-                    />
-                  </div>
+        {/* DESKTOP — single line row with arrows over the row edges */}
+        <div className="relative hidden md:block">
+          <button
+            type="button"
+            onClick={() => scrollByAmount(-1)}
+            disabled={!canScrollLeft}
+            aria-label="Scroll categories left"
+            className={`${arrowBtn} -left-4 lg:-left-5`}
+          >
+            <ChevronLeft size={20} />
+          </button>
 
-                  <div className="p-1.5">
-                    <h3 className=" text-gray-800 text-center text-sm group-hover:primaryTextColor transition-colors">
-                      {item.name}
-                    </h3>
+          <button
+            type="button"
+            onClick={() => scrollByAmount(1)}
+            disabled={!canScrollRight}
+            aria-label="Scroll categories right"
+            className={`${arrowBtn} -right-4 lg:-right-5`}
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          <div
+            ref={scrollRef}
+            className="flex flex-nowrap gap-4 overflow-x-auto scroll-smooth px-12 py-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:snap-x md:snap-mandatory"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {loading
+              ? Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="w-[158px] shrink-0">
+                    {skeletonCard(i)}
                   </div>
-                </Link>
-              ),
-            )}
+                ))
+              : [
+                  ...allItems.map((item, i) => (
+                    <div
+                      key={`${item._id || i}`}
+                      className="w-[158px] shrink-0 snap-start"
+                    >
+                      {renderItem(item, i)}
+                    </div>
+                  )),
+                  <div key="shop-all" className="w-[158px] shrink-0 snap-start">
+                    {shopAllCard}
+                  </div>,
+                ]}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
 };
 
-export default FeatureCategory;
+export default ShopByCategory;
