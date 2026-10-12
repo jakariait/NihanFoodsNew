@@ -1,4 +1,3 @@
-import React from 'react';
 import useAuthAdminStore from '../../store/AuthAdminStore.js';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -21,9 +20,16 @@ const RequirePermission = ({
       ? requiredPermissions.some((perm) => userPermissions.includes(perm))
       : requiredPermissions.every((perm) => userPermissions.includes(perm)));
 
-  if (fallback === true) return <>{children}</>;
+  if (hasPermission) {
+    return <>{children}</>;
+  }
 
-  if (!hasPermission && (loading || !Array.isArray(userPermissions))) {
+  // fallback === true → hide silently when permission is missing
+  if (fallback === true) {
+    return null;
+  }
+
+  if (loading || !Array.isArray(userPermissions)) {
     return (
       <div className="flex justify-center py-4">
         <Skeleton className="h-6 w-6 rounded-full" />
@@ -31,11 +37,9 @@ const RequirePermission = ({
     );
   }
 
-  if (hasPermission) {
-    return <>{children}</>;
+  if (fallback) {
+    return <>{fallback}</>;
   }
-
-  if (fallback) return <>{fallback}</>;
 
   return (
     <div className="p-2 border border-dashed border-muted-foreground/30 rounded-md">

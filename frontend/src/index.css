@@ -170,6 +170,9 @@
 .hover\:primaryTextColor:hover {
   color: var(--primaryColor);
 }
+.hover\:primaryBgColor:hover {
+  background-color: var(--primaryColor);
+}
 .hover\:secondaryTextColor:hover {
   color: var(--secondaryColor);
 }
@@ -341,6 +344,39 @@
    drop it so the banner sits flush against the next section */
 .product-carousel .slick-slider {
   margin-bottom: 0;
+}
+
+/* Customer feedback slider — static dots under the cards.
+   (Arrows are positioned with utilities in the component: react-slick's
+   slick-arrow/slick-prev/slick-next classes never reach custom arrows.) */
+.customer-feedback .slick-dots {
+  position: static;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 1.5rem;
+}
+.customer-feedback .slick-dots li {
+  width: auto;
+  height: auto;
+}
+.customer-feedback .slick-dots li button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: #d1d5db;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+.customer-feedback .slick-dots li button::before {
+  content: none;
+}
+.customer-feedback .slick-dots li.slick-active button {
+  width: 24px;
+  background: var(--primaryColor);
 }
 
 @keyframes scrollMarquee {

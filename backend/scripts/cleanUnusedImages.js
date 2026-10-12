@@ -11,6 +11,7 @@ import GeneralInfoModel from '../models/GeneralInfoModel.js';
 import ProductModel from '../models/ProductModel.js';
 import UserModel from '../models/UserModel.js';
 import BlogModel from '../models/BlogModel.js';
+import CustomerFeedbackModel from '../models/CustomerFeedbackModel.js';
 
 // Setup __dirname for ES module
 const __filename = fileURLToPath(import.meta.url);
@@ -55,6 +56,9 @@ const collectUsedImages = async () => {
 
   const blogs = await BlogModel.find({}, 'thumbnailImage');
   blogs.forEach((user) => addImage(user.userImage));
+
+  const feedbacks = await CustomerFeedbackModel.find({}, 'image');
+  feedbacks.forEach((item) => addImage(item.image));
 };
 
 await collectUsedImages();

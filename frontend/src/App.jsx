@@ -137,6 +137,9 @@ const ChildCategoryPage = lazy(
 const ProductOptionsPage = lazy(
   () => import('./pagesAdmin/ProductOptionsPage.jsx'),
 );
+const CustomerFeedbackPage = lazy(
+  () => import('./pagesAdmin/CustomerFeedbackPage.jsx'),
+);
 const WishlistPage = lazy(() => import('./pagesUser/WishlistPage.jsx'));
 
 function App() {
@@ -286,6 +289,10 @@ function App() {
               <Route
                 path="/admin/contact-request"
                 element={<ContactRequestPage />}
+              />
+              <Route
+                path="/admin/customer-feedback"
+                element={<CustomerFeedbackPage />}
               />
               <Route path="/admin/category" element={<CategoryPage />} />
               <Route path="/admin/subcategory" element={<SubCategoryPage />} />

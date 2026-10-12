@@ -37,6 +37,7 @@ const PassWordResetController = require('../controllers/PassWordResetController'
 const pathaoController = require('../controllers/pathaoController');
 const pathaoConfigController = require('../controllers/pathaoConfigController');
 const productOptionController = require('../controllers/ProductOptionController');
+const customerFeedbackController = require('../controllers/customerFeedbackController');
 
 const { handleCourierCheck, getDynamicCourierStatus } = require('../controllers/courierController');
 const cacheMiddleware = require('../middlewares/redisCacheMiddleware');
@@ -144,6 +145,10 @@ const upload = multer({ storage, fileFilter }).fields([
   },
   {
     name: 'image',
+    maxCount: 1,
+  },
+  {
+    name: 'customerImage',
     maxCount: 1,
   },
 ]);
@@ -792,6 +797,43 @@ router.delete(
   adminProtect,
   checkPermission('product_size'),
   productOptionController.deleteProductOption
+);
+
+// Public route for the storefront testimonials slider
+router.get('/activecustomer-feedback', customerFeedbackController.getActiveFeedback);
+
+// Routes for Customer Feedback
+router.post(
+  '/customer-feedback',
+  adminProtect,
+  checkPermission('customer_feedback'),
+  upload,
+  customerFeedbackController.createFeedback
+);
+router.get(
+  '/customer-feedback',
+  adminProtect,
+  checkPermission('customer_feedback'),
+  customerFeedbackController.getAllFeedback
+);
+router.get(
+  '/customer-feedback/:id',
+  adminProtect,
+  checkPermission('customer_feedback'),
+  customerFeedbackController.getFeedbackById
+);
+router.put(
+  '/customer-feedback/:id',
+  adminProtect,
+  checkPermission('customer_feedback'),
+  upload,
+  customerFeedbackController.updateFeedback
+);
+router.delete(
+  '/customer-feedback/:id',
+  adminProtect,
+  checkPermission('customer_feedback'),
+  customerFeedbackController.deleteFeedback
 );
 
 // Routes for meta catalog

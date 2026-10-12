@@ -18,6 +18,7 @@ async function ensureTestAdmin() {
       'pathao_api',
       'admin-users',
       'delete_customers',
+      'customer_feedback',
     ],
   });
 }

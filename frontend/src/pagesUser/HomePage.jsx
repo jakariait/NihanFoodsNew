@@ -4,6 +4,7 @@ import useProductStore from '../store/useProductStore.js';
 import ProductCarousel from '../component/componentGeneral/ProductCarousel.jsx';
 import ProductByFlag from '../component/componentGeneral/ProductByFlag.jsx';
 import FeatureCategory from '#component/componentGeneral/FeatureCategory.jsx';
+import CustomerFeedback from '#component/componentGeneral/CustomerFeedback.jsx';
 
 const HomePage = () => {
   const { CarouselStoreListRequest } = CarouselStore();
@@ -20,6 +21,7 @@ const HomePage = () => {
       <ProductCarousel />
       <FeatureCategory />
       <ProductByFlag />
+      <CustomerFeedback />
     </>
   );
 };

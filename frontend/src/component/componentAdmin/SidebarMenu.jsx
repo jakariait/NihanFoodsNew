@@ -18,6 +18,7 @@ import {
   FaInfo,
   FaClipboardList,
   FaBlog,
+  FaStar,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import useAuthAdminStore from '../../store/AuthAdminStore.js';
@@ -209,6 +210,7 @@ export const MENU_CONFIG = [
         icon: FaCreditCard,
         path: '/admin/gateway-api',
         permission: ['bkash_api', 'steadfast_api', 'pathao_api'],
+        match: 'any',
       },
     ],
   },
@@ -247,6 +249,13 @@ export const MENU_CONFIG = [
         icon: FaBlog,
         path: '/admin/blogs',
         permission: 'blogs',
+      },
+      {
+        type: 'link',
+        label: 'Customer Feedback',
+        icon: FaStar,
+        path: '/admin/customer-feedback',
+        permission: 'customer_feedback',
       },
     ],
   },
@@ -343,7 +352,14 @@ function MenuAccordion({ item, countValue, expanded, onChange }) {
       >
         <ul className="space-y-2 pl-4 pt-1">
           {item.items.map((subItem, idx) => (
-            <MenuItem key={idx} item={subItem} countValue={countValue} />
+            <RequirePermission
+              key={`${item.section}-${idx}`}
+              permission={subItem.permission}
+              match={subItem.match}
+              fallback={true}
+            >
+              <MenuItem item={subItem} countValue={countValue} />
+            </RequirePermission>
           ))}
         </ul>
       </div>
@@ -355,7 +371,6 @@ export default function SidebarMenu() {
   const { totalProductsAdmin, fetchProductsAdmin } = useProductStore();
   const { logout } = useAuthAdminStore();
   const { totalByStatus, fetchAllStatusCounts } = useOrderStore();
-  const { loading } = useAuthAdminStore();
 
   useEffect(() => {
     fetchProductsAdmin({ page: 1, limit: 1 });
@@ -418,6 +433,7 @@ export default function SidebarMenu() {
               <RequirePermission
                 key={sectionIdx}
                 permission={item.permission}
+                match={item.match}
                 fallback={true}
               >
                 <li>
@@ -464,6 +480,7 @@ export default function SidebarMenu() {
                 <RequirePermission
                   key={`${sectionIdx}-${itemIdx}`}
                   permission={item.permission}
+                  match={item.match}
                   fallback={true}
                 >
                   <li>
