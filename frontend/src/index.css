@@ -381,3 +381,7 @@ body {
   overflow-x: clip;
   max-width: 100%;
 }
+
+html body[data-scroll-locked] {
+  margin-right: 0 !important;
+}

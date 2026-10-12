@@ -74,22 +74,22 @@ const STOCK_OPTIONS = [
 ];
 
 const CHIP_TINTS = {
-  blue: 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200',
-  green: 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200',
-  purple: 'bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-200',
-  orange: 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200',
-  gray: 'bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-200',
+  blue: 'bg-blue-100/80 text-blue-700',
+  green: 'bg-emerald-100/80 text-emerald-700',
+  purple: 'bg-purple-100/80 text-purple-700',
+  orange: 'bg-orange-100/80 text-orange-700',
+  gray: 'bg-gray-100 text-gray-700',
 };
 
 const pillTriggerClass = (isSet, tinted) =>
   cn(
-    'h-10 w-full min-w-0 rounded-full border bg-white px-3.5 shadow-xs transition-all duration-200 outline-none',
-    'hover:border-gray-300 hover:shadow-sm',
-    'focus-visible:border-[var(--primaryColor)] focus-visible:ring-4 focus-visible:ring-[var(--primaryColor)]/10',
+    'h-10 w-full min-w-0 rounded-full border-0 bg-gray-100 px-3.5 shadow-none transition-colors duration-200 outline-none',
+    'hover:bg-gray-200/80',
+    'focus-visible:ring-2 focus-visible:ring-[var(--primaryColor)]/30',
     'data-[placeholder]:text-gray-400 [&_svg]:shrink-0',
     isSet && tinted
-      ? 'border-[var(--primaryColor)]/40 bg-[var(--primaryColor)]/5 text-[var(--primaryColor)]'
-      : 'border-gray-200 text-gray-700',
+      ? 'bg-[var(--primaryColor)]/10 text-[var(--primaryColor)] hover:bg-[var(--primaryColor)]/15'
+      : 'text-gray-700',
   );
 
 const SearchField = memo(function SearchField({
@@ -101,9 +101,9 @@ const SearchField = memo(function SearchField({
   return (
     <div
       className={cn(
-        'group relative flex w-full min-w-0 items-center rounded-full border border-gray-200 bg-gray-50 transition-all duration-300',
-        'hover:border-gray-300 hover:bg-white',
-        'focus-within:border-[var(--primaryColor)] focus-within:bg-white focus-within:ring-4 focus-within:ring-[var(--primaryColor)]/10',
+        'group relative flex w-full min-w-0 items-center rounded-full bg-gray-100 transition-all duration-300',
+        'hover:bg-gray-200/70',
+        'focus-within:bg-white focus-within:ring-4 focus-within:ring-[var(--primaryColor)]/10',
         className,
       )}
     >
@@ -166,7 +166,11 @@ const FilterPill = memo(function FilterPill({
           <span className="truncate">{selected?.label ?? 'All'}</span>
         </span>
       </SelectTrigger>
-      <SelectContent position="popper" align="start" className="rounded-xl">
+      <SelectContent
+        position="popper"
+        align="start"
+        className="rounded-2xl border-0 shadow-lg shadow-black/5"
+      >
         {options.map((option) => (
           <SelectItem
             key={option.value}
@@ -247,7 +251,7 @@ const ActiveFilterChips = memo(function ActiveFilterChips({
   if (chips.length === 0) return null;
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2">
+    <div className="mb-4 flex flex-wrap items-center gap-2 md:mt-1">
       {chips.map((chip) => (
         <Chip
           key={chip.key}
@@ -275,7 +279,7 @@ const MobileToolbar = memo(function MobileToolbar({
   onOpenSort,
 }) {
   const baseBtn =
-    'inline-flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 shadow-xs transition-all duration-200 hover:border-gray-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--primaryColor)]/10';
+    'inline-flex h-10 items-center gap-2 rounded-full bg-gray-100 px-4 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primaryColor)]/30';
 
   return (
     <div className="mb-4 flex items-center justify-between gap-3 md:hidden">
@@ -450,14 +454,74 @@ const ProductFilterToolbar = ({ filters, onFilterChange, totalProducts }) => {
 
   return (
     <>
-      <MobileToolbar
-        activeCount={activeCount}
-        sortLabel={
-          currentSort.value === 'all' ? 'Sort' : currentSort.shortLabel
-        }
-        onOpenFilters={() => setFilterDrawerOpen(true)}
-        onOpenSort={() => setSortSheetOpen(true)}
-      />
+      {/* Desktop filter bar — full-bleed band, pills aligned to xl:container */}
+      <div className="hidden w-full bg-gray-50/80 py-2.5 md:block">
+        <div className="xl:container xl:mx-auto px-6">
+          <div className="grid grid-cols-12 gap-2">
+            <div className="col-span-4 md:col-span-3">
+              <FilterPill
+                label="Category"
+                value={filters.category}
+                options={categoryOptions}
+                onValueChange={(value) => handleFieldChange('category', value)}
+              />
+            </div>
+            <div className="col-span-4 md:col-span-3">
+              <FilterPill
+                label="Flag"
+                value={filters.flags}
+                options={flagOptions}
+                onValueChange={(value) => handleFieldChange('flags', value)}
+              />
+            </div>
+            <div className="col-span-4 md:col-span-2">
+              <FilterPill
+                label="Stock"
+                value={filters.stock}
+                options={stockOptions}
+                onValueChange={(value) => handleFieldChange('stock', value)}
+              />
+            </div>
+            <div className="col-span-6 md:col-span-2">
+              <FilterPill
+                label="Sort"
+                value={filters.sort}
+                options={sortOptions}
+                onValueChange={(value) => handleFieldChange('sort', value)}
+              />
+            </div>
+            <div className="col-span-6 md:col-span-2">
+              <FilterPill
+                label="Per page"
+                value={String(filters.limit)}
+                options={limitOptions}
+                tinted={false}
+                onValueChange={(value) =>
+                  handleFieldChange('limit', parseInt(value, 10))
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile toolbar + active chips — aligned to xl:container */}
+      <div className="xl:container xl:mx-auto px-6">
+        <MobileToolbar
+          activeCount={activeCount}
+          sortLabel={
+            currentSort.value === 'all' ? 'Sort' : currentSort.shortLabel
+          }
+          onOpenFilters={() => setFilterDrawerOpen(true)}
+          onOpenSort={() => setSortSheetOpen(true)}
+        />
+
+        <ActiveFilterChips
+          filters={filters}
+          onRemove={handleRemoveChip}
+          onClearAll={handleClearAll}
+        />
+      </div>
 
       {/* Mobile filter drawer */}
       <Drawer
@@ -468,7 +532,7 @@ const ProductFilterToolbar = ({ filters, onFilterChange, totalProducts }) => {
         aria-label="Filter options"
       >
         <div className="flex h-full flex-col">
-          <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3.5">
+          <div className="flex shrink-0 items-center justify-between px-4 pt-4 pb-2">
             <div>
               <h2 className="text-base font-semibold text-gray-900">Filters</h2>
               <p className="text-xs text-gray-500">Narrow down products</p>
@@ -515,11 +579,11 @@ const ProductFilterToolbar = ({ filters, onFilterChange, totalProducts }) => {
             />
           </div>
 
-          <div className="flex shrink-0 gap-2 border-t border-gray-100 p-3">
+          <div className="flex shrink-0 gap-2 px-3 pt-2 pb-4">
             <button
               type="button"
               onClick={handleClearAll}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-gray-200 text-sm font-semibold text-gray-600 transition hover:border-[var(--primaryColor)]/40 hover:text-[var(--primaryColor)]"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-gray-100 text-sm font-semibold text-gray-600 transition hover:bg-gray-200/80 hover:text-[var(--primaryColor)]"
             >
               <RotateCcw className="size-3.5" />
               Clear all
@@ -527,7 +591,7 @@ const ProductFilterToolbar = ({ filters, onFilterChange, totalProducts }) => {
             <button
               type="button"
               onClick={() => setFilterDrawerOpen(false)}
-              className="primaryBgColor accentTextColor inline-flex h-11 flex-[1.4] items-center justify-center rounded-full text-sm font-semibold shadow-sm transition hover:opacity-90"
+              className="primaryBgColor accentTextColor inline-flex h-11 flex-[1.4] items-center justify-center rounded-full text-sm font-semibold transition hover:opacity-90"
             >
               {typeof totalProducts === 'number'
                 ? `Show ${totalProducts} product${totalProducts === 1 ? '' : 's'}`
@@ -595,63 +659,6 @@ const ProductFilterToolbar = ({ filters, onFilterChange, totalProducts }) => {
           </div>
         </div>
       </Drawer>
-
-      {/* Desktop filter bar */}
-      <div className="mb-6 hidden md:block">
-        <div className="rounded-2xl border border-gray-200/80 bg-white p-3 shadow-xs">
-          <div className="grid grid-cols-12 gap-2">
-            <div className="col-span-4 md:col-span-3">
-              <FilterPill
-                label="Category"
-                value={filters.category}
-                options={categoryOptions}
-                onValueChange={(value) => handleFieldChange('category', value)}
-              />
-            </div>
-            <div className="col-span-4 md:col-span-3">
-              <FilterPill
-                label="Flag"
-                value={filters.flags}
-                options={flagOptions}
-                onValueChange={(value) => handleFieldChange('flags', value)}
-              />
-            </div>
-            <div className="col-span-4 md:col-span-2">
-              <FilterPill
-                label="Stock"
-                value={filters.stock}
-                options={stockOptions}
-                onValueChange={(value) => handleFieldChange('stock', value)}
-              />
-            </div>
-            <div className="col-span-6 md:col-span-2">
-              <FilterPill
-                label="Sort"
-                value={filters.sort}
-                options={sortOptions}
-                onValueChange={(value) => handleFieldChange('sort', value)}
-              />
-            </div>
-            <div className="col-span-6 md:col-span-2">
-              <FilterPill
-                label="Per page"
-                value={String(filters.limit)}
-                options={limitOptions}
-                tinted={false}
-                onValueChange={(value) =>
-                  handleFieldChange('limit', parseInt(value, 10))
-                }
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <ActiveFilterChips
-        filters={filters}
-        onRemove={handleRemoveChip}
-        onClearAll={handleClearAll}
-      />
     </>
   );
 };

@@ -72,99 +72,103 @@ const Product = () => {
   // Show error if exists
   if (error) {
     return (
-      <Typography variant="h6" color="error" className="p-4">
-        {error}
-      </Typography>
+      <div className="xl:container xl:mx-auto px-6 py-4">
+        <Typography variant="h6" color="error">
+          {error}
+        </Typography>
+      </div>
     );
   }
 
   return (
-    <div className="xl:container xl:mx-auto px-6 py-5 justify-center md:justify-start">
-      {/* Loading skeletons */}
-      {loading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, idx) => (
-            <div key={idx} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, subIdx) => (
-                <Skeleton key={subIdx} height={250} width="100%" />
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <>
-          {/* Filter bar, mobile toolbars/drawers, and active-filter chips */}
-          <ProductFilterToolbar
-            filters={currentFilters}
-            onFilterChange={handleFilterChange}
-            totalProducts={totalProducts}
-          />
+    <>
+      {/* Full-bleed filter band; its inner xl:container aligns pills with the page */}
+      <ProductFilterToolbar
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        totalProducts={totalProducts}
+      />
 
-          {/* Product List or No Results */}
-          {products.length === 0 ? (
-            <div className="text-center py-20">
-              <Typography variant="h6" className="text-gray-500 mb-4">
-                {currentFilters.search
-                  ? `No products found for "${currentFilters.search}"`
-                  : 'No products found'}
-              </Typography>
-              <Typography variant="body2" className="text-gray-400">
-                {currentFilters.search
-                  ? 'Try a different search term or adjust your filters'
-                  : 'Try adjusting your filters or search criteria'}
-              </Typography>
-            </div>
-          ) : (
-            <ProductList products={products} />
-          )}
+      <div className="xl:container xl:mx-auto px-6 py-5 justify-center md:justify-start">
+        {/* Loading skeletons */}
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(3)].map((_, idx) => (
+              <div key={idx} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, subIdx) => (
+                  <Skeleton key={subIdx} height={250} width="100%" />
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Product List or No Results */}
+            {products.length === 0 ? (
+              <div className="text-center py-20">
+                <Typography variant="h6" className="text-gray-500 mb-4">
+                  {currentFilters.search
+                    ? `No products found for "${currentFilters.search}"`
+                    : 'No products found'}
+                </Typography>
+                <Typography variant="body2" className="text-gray-400">
+                  {currentFilters.search
+                    ? 'Try a different search term or adjust your filters'
+                    : 'Try adjusting your filters or search criteria'}
+                </Typography>
+              </div>
+            ) : (
+              <ProductList products={products} />
+            )}
 
-          {/* Pagination Controls */}
-          {totalPages > 0 && (
-            <div className="flex justify-center items-center mt-8 gap-4">
-              <button
-                onClick={() => handlePageChange(currentFilters.page - 1)}
-                disabled={currentFilters.page === 1 || loading}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
+            {/* Pagination Controls */}
+            {totalPages > 0 && (
+              <div className="flex justify-center items-center mt-8 gap-4">
+                <button
+                  onClick={() => handlePageChange(currentFilters.page - 1)}
+                  disabled={currentFilters.page === 1 || loading}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
                   ${
                     currentFilters.page === 1 || loading
                       ? 'border-gray-300 text-gray-400 cursor-not-allowed'
                       : 'border-gray-500 hover:bg-gray-100'
                   }`}
-                aria-label="Previous page"
-              >
-                <ChevronLeft size={18} aria-hidden="true" />
-                <span className="hidden md:block">Previous</span>
-              </button>
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft size={18} aria-hidden="true" />
+                  <span className="hidden md:block">Previous</span>
+                </button>
 
-              <div className="flex items-center gap-2 text-sm">
-                <span>
-                  Page {currentFilters.page} of {totalPages}
-                </span>
-                <span className="hidden md:block text-gray-500">
-                  • {totalProducts} Products
-                  {currentFilters.search && ` for "${currentFilters.search}"`}
-                </span>
-              </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>
+                    Page {currentFilters.page} of {totalPages}
+                  </span>
+                  <span className="hidden md:block text-gray-500">
+                    • {totalProducts} Products
+                    {currentFilters.search && ` for "${currentFilters.search}"`}
+                  </span>
+                </div>
 
-              <button
-                onClick={() => handlePageChange(currentFilters.page + 1)}
-                disabled={currentFilters.page >= totalPages || loading}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
+                <button
+                  onClick={() => handlePageChange(currentFilters.page + 1)}
+                  disabled={currentFilters.page >= totalPages || loading}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
                   ${
                     currentFilters.page >= totalPages || loading
                       ? 'border-gray-300 text-gray-400 cursor-not-allowed'
                       : 'border-gray-500 hover:bg-gray-100'
                   }`}
-                aria-label="Next page"
-              >
-                <span className="hidden md:block">Next</span>
-                <ChevronRight size={18} aria-hidden="true" />
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+                  aria-label="Next page"
+                >
+                  <span className="hidden md:block">Next</span>
+                  <ChevronRight size={18} aria-hidden="true" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 };
 
