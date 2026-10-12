@@ -75,7 +75,7 @@ const ViewAllProducts = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     fetchProductsAdmin(filters);
@@ -99,21 +99,21 @@ const ViewAllProducts = () => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const handleOpenDialog = (id) => {
-    setSelectedProductId(id);
+  const handleOpenDialog = (product) => {
+    setSelectedProduct(product);
     setDeleteDialogOpen(true);
   };
 
   const handleDelete = async () => {
     try {
-      await deleteProduct(selectedProductId);
-      toast.success(`Product ID ${selectedProductId} deleted successfully!`);
+      await deleteProduct(selectedProduct.id);
+      toast.success(`"${selectedProduct.name}" deleted successfully!`);
       fetchProductsAdmin(filters);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to delete product.');
     } finally {
       setDeleteDialogOpen(false);
-      setSelectedProductId(null);
+      setSelectedProduct(null);
     }
   };
 
@@ -418,7 +418,7 @@ const ViewAllProducts = () => {
                               <Button
                                 variant="ghost"
                                 size="icon-xs"
-                                onClick={() => handleOpenDialog(product.id)}
+                                onClick={() => handleOpenDialog(product)}
                                 className="text-destructive hover:text-destructive"
                               >
                                 <Trash2 className="size-3.5" />
@@ -499,8 +499,11 @@ const ViewAllProducts = () => {
           <DialogHeader>
             <DialogTitle>Confirm Delete</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this product? This action cannot
-              be undone.
+              Are you sure you want to delete{' '}
+              <span className="font-semibold text-foreground">
+                &quot;{selectedProduct?.name}&quot;
+              </span>
+              ? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
