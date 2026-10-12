@@ -9,6 +9,7 @@ const ImageComponent = ({
   width,
   height,
   fetchpriority,
+  onLoad,
 }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -59,7 +60,10 @@ const ImageComponent = ({
             opacity: isLoading ? 0 : 1,
             position: 'relative',
           }}
-          onLoad={() => setIsLoading(false)}
+          onLoad={() => {
+            setIsLoading(false);
+            onLoad?.();
+          }}
           onError={() => {
             setIsLoading(false);
             setHasError(true);

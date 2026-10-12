@@ -335,6 +335,12 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* slick-theme.css adds margin-bottom: 30px to .slick-slider —
+   drop it so the banner sits flush against the next section */
+.product-carousel .slick-slider {
+  margin-bottom: 0;
+}
+
 @keyframes scrollMarquee {
   0% {
     transform: translateX(100%);

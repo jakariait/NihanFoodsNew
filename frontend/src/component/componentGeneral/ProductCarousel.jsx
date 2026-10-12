@@ -17,6 +17,9 @@ const Slide = ({ product, index }) => {
       skeletonHeight={400}
       altName={`Banner ${index + 1}`}
       fetchpriority={index === 0 ? 'high' : undefined}
+      // slick locks the slide height at init (while the skeleton is still
+      // 400px tall) — dispatch a resize once the image loads so it re-measures
+      onLoad={() => window.dispatchEvent(new Event('resize'))}
     />
   );
 
@@ -71,6 +74,7 @@ const ProductCarousel = () => {
     autoplaySpeed: 6000,
     pauseOnHover: false,
     arrows: true,
+    adaptiveHeight: true,
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
   };
