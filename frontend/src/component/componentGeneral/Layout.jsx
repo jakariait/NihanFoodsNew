@@ -5,11 +5,13 @@ import { Toaster } from '@/components/ui/sonner';
 import WhatsAppButton from '@/component/componentGeneral/WhatsAppButton.jsx';
 import Newsletter from '#component/componentGeneral/Newsletter.jsx';
 import BottomFooterPromo from '#component/componentGeneral/BottomFooterPromo.jsx';
+import FreeDeliveryBar from '#component/componentGeneral/FreeDeliveryBar.jsx';
 
 const Layout = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen pb-[calc(68px_+_env(safe-area-inset-bottom))] lg:pb-0">
       <MarqueeModern />
+      <FreeDeliveryBar />
       <Headers />
       <Toaster position="top-right" />
       <main className="flex-grow">{children}</main>

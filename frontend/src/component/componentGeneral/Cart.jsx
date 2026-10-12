@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import useCartStore from '../../store/useCartStore.js';
 import { Link } from 'react-router-dom';
 import { FaTrash, FaTruck } from 'react-icons/fa';
@@ -8,6 +10,23 @@ import emptyCart from '../../assets/empty_cart.png';
 
 const Cart = ({ onCloseCartMenu }) => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const [freeDelivery, setFreeDelivery] = useState(null);
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const fetchAmount = async () => {
+      try {
+        const res = await axios.get(`${apiUrl}/getFreeDeliveryAmount`);
+        if (res.data?.success) {
+          setFreeDelivery(res.data?.data?.value);
+        }
+      } catch (err) {
+        console.error('Failed to fetch free delivery amount:', err.message);
+      }
+    };
+
+    fetchAmount();
+  }, [apiUrl]);
 
   const totalAmount = cart.reduce((total, item) => {
     const price =
@@ -176,8 +195,49 @@ const Cart = ({ onCloseCartMenu }) => {
           </p>
         )}
 
+        {freeDelivery > 0 && (
+          <div className="mt-3 rounded-xl bg-gray-50 p-3">
+            {totalAmount < freeDelivery ? (
+              <>
+                <p className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+                  <FaTruck
+                    className="shrink-0 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  Add{' '}
+                  <span className="font-bold text-gray-900">
+                    Tk. {formatPrice(freeDelivery - totalAmount)}
+                  </span>{' '}
+                  more to get free delivery
+                </p>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="primaryBgColor h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.round((totalAmount / freeDelivery) * 100),
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="flex items-center gap-1.5 text-xs font-semibold text-green-700">
+                <FaTruck
+                  className="shrink-0 text-green-600"
+                  aria-hidden="true"
+                />
+                Free delivery unlocked — shipping is on us
+              </p>
+            )}
+          </div>
+        )}
+
         <p className="mt-1 text-xs text-gray-500">
-          Shipping calculated at checkout
+          {freeDelivery > 0 && totalAmount >= freeDelivery
+            ? 'Free delivery applied at checkout'
+            : 'Shipping calculated at checkout'}
         </p>
         <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-gray-700">
           <FaTruck className="text-gray-400" aria-hidden="true" />
