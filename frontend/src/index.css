@@ -366,4 +366,12 @@
 
 html {
   scroll-behavior: smooth; /* Smooth scrolling globally */
+  overflow-x: hidden;
+  overflow-x: clip; /* clip keeps position: sticky working */
+}
+
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
 }
