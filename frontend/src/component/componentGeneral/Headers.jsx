@@ -52,10 +52,6 @@ const Headers = () => {
   const cartMenuRef = useRef(null);
   const headerMainRef = useRef(null);
 
-  const prevCartCount = useRef(
-    cart.reduce((total, item) => total + item.quantity, 0),
-  );
-
   useEffect(() => {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 40);
@@ -114,20 +110,6 @@ const Headers = () => {
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, isCartMenuOpen, isDropdownOpen]);
-
-  useEffect(() => {
-    const currentCartCount = cart.reduce(
-      (total, item) => total + item.quantity,
-      0,
-    );
-    if (
-      currentCartCount > prevCartCount.current &&
-      !window.location.pathname.includes('/checkout')
-    ) {
-      setIsCartMenuOpen(true);
-    }
-    prevCartCount.current = currentCartCount;
-  }, [cart]);
 
   // Close drawers on Escape (mobile search sheet handles its own Escape)
   useEffect(() => {
@@ -256,6 +238,7 @@ const Headers = () => {
 
                     <button
                       ref={cartButtonRef}
+                      id="header-cart-button"
                       onClick={() => {
                         setIsCartMenuOpen((p) => !p);
                         setIsMobileSearchOpen(false);

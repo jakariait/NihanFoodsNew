@@ -8,6 +8,7 @@ import ProductAddToCart from './ProductAddToCart.jsx';
 import ImageComponent from './ImageComponent.jsx';
 import WishlistButton from './WishlistButton.jsx';
 import useCartStore from '../../store/useCartStore.js';
+import { flyToCart } from '../../utils/flyToCart.js';
 
 const formatPrice = (price) => {
   if (isNaN(price)) return price;
@@ -200,7 +201,13 @@ const ProductList = ({ products }) => {
 
                     {/* +Add (right) */}
                     <button
-                      onClick={() => addToCart(product, 1, selectedVariant)}
+                      onClick={(e) => {
+                        addToCart(product, 1, selectedVariant);
+                        const cardImg = e.currentTarget
+                          .closest('.group')
+                          ?.querySelector('img');
+                        flyToCart(cardImg, cardImg?.src || product.thumbnailImage);
+                      }}
                       disabled={outOfStock}
                       aria-label={`Add ${product.name} to cart`}
                       className="primaryBgColor accentTextColor shrink-0 flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"

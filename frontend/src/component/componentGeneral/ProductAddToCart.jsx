@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import useCartStore from '../../store/useCartStore.js';
 import WishlistButton from './WishlistButton.jsx';
 import sanitizeHtml from '../../utils/sanitizeHtml.js';
+import { flyToCart } from '../../utils/flyToCart.js';
 
 const ProductAddToCart = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
@@ -163,7 +164,7 @@ const ProductAddToCart = ({ product }) => {
     setValidationMessage(''); // Clear message on selection change
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
     if (product.variants?.length > 0 && !selectedVariant) {
       const requiredOptions = options.map((o) => o.name);
       const missingOptions = requiredOptions.filter(
@@ -178,6 +179,14 @@ const ProductAddToCart = ({ product }) => {
     }
     addToCart(product, quantity, selectedVariant);
     setValidationMessage(''); // Clear message on success
+
+    const galleryImg = document.querySelector(
+      '[data-product-gallery] img',
+    );
+    flyToCart(
+      galleryImg || e?.currentTarget,
+      galleryImg?.src || product.thumbnailImage,
+    );
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
@@ -387,7 +396,7 @@ const ProductAddToCart = ({ product }) => {
             ) : (
               <button
                 className="primaryBgColor accentTextColor px-2 py-1 md:py-2 rounded flex-1 min-w-[120px] cursor-pointer"
-                onClick={handleAddToCart}
+                onClick={(e) => handleAddToCart(e)}
               >
                 ADD TO CART
               </button>

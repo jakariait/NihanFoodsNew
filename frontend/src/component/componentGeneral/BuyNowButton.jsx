@@ -6,6 +6,7 @@ import { FaPlus } from 'react-icons/fa6';
 import { FiMinus } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../../store/useCartStore.js';
+import { flyToCart } from '../../utils/flyToCart.js';
 
 const BuyNowButton = ({ product, isAddToCart = false }) => {
   const [open, setOpen] = useState(false);
@@ -56,9 +57,10 @@ const BuyNowButton = ({ product, isAddToCart = false }) => {
     setSelectedVariant(newVariant);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (e) => {
     addToCart(product, quantity, selectedVariant);
     if (isAddToCart) {
+      flyToCart(e?.currentTarget, product.thumbnailImage);
       handleClose();
     } else {
       navigate('/checkout');
@@ -200,7 +202,7 @@ const BuyNowButton = ({ product, isAddToCart = false }) => {
               Cancel
             </Button>
             <Button
-              onClick={handleConfirm}
+              onClick={(e) => handleConfirm(e)}
               disabled={
                 (product.variants?.length > 0 && !selectedVariant) ||
                 selectedVariant?.stock === 0 ||
