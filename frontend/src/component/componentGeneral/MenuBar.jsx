@@ -36,9 +36,7 @@ const MenuBar = () => {
     [location.search],
   );
 
-  const navCategories = (categories || []).filter(
-    (category) => category.showOnNavbar,
-  );
+  const navCategories = categories || [];
 
   return (
     <div className="lg:bg-white">
