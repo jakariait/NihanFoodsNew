@@ -220,7 +220,7 @@ const getOrderById = async (orderId) => {
       .populate({
         path: 'items.productId',
         select:
-          '-sizeChart -longDesc -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
+          '-sizeChart -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
         populate: [
           {
             path: 'category',
@@ -482,7 +482,7 @@ const getOrderByOrderNo = async (orderNo) => {
       .populate({
         path: 'items.productId',
         select:
-          '-sizeChart -longDesc -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
+          '-sizeChart -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
         populate: [
           {
             path: 'category',
@@ -535,7 +535,7 @@ const getOrdersByUserId = async (userId) => {
       .populate({
         path: 'items.productId',
         select:
-          '-sizeChart -longDesc -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
+          '-sizeChart -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
         populate: [
           {
             path: 'category',
@@ -596,7 +596,7 @@ const trackOrderByOrderNoAndPhone = async (orderNo, phone) => {
     .populate({
       path: 'items.productId',
       select:
-        '-sizeChart -longDesc -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
+        '-sizeChart -shortDesc -shippingReturn -videoUrl -flags -metaTitle -metaDescription -metaKeywords -searchTags',
       populate: [
         {
           path: 'category',

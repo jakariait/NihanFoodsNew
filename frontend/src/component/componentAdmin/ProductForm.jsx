@@ -67,7 +67,6 @@ const ProductForm = ({ isEdit: isEditMode }) => {
 
   const [name, setName] = useState('');
   const [shortDesc, setShortDesc] = useState('');
-  const [longDesc, setLongDesc] = useState('');
   const [productCode, setProductCode] = useState('');
   const [rewardPoints, setRewardPoints] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -128,7 +127,6 @@ const ProductForm = ({ isEdit: isEditMode }) => {
     if (isEditMode && product) {
       setName(product.name || '');
       setShortDesc(product.shortDesc || '');
-      setLongDesc(product.longDesc || '');
       setProductCode(product.productCode || '');
       setRewardPoints(product.rewardPoints || '');
       setVideoUrl(product.videoUrl || '');
@@ -465,7 +463,6 @@ const ProductForm = ({ isEdit: isEditMode }) => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('shortDesc', shortDesc);
-    formData.append('longDesc', longDesc);
     formData.append('productCode', productCode);
     formData.append('rewardPoints', rewardPoints);
     formData.append('videoUrl', videoUrl);
@@ -556,7 +553,6 @@ const ProductForm = ({ isEdit: isEditMode }) => {
         toast.success('Product created successfully!');
         setName('');
         setShortDesc('');
-        setLongDesc('');
         setProductCode('');
         setRewardPoints('');
         setVideoUrl('');
@@ -672,15 +668,6 @@ const ProductForm = ({ isEdit: isEditMode }) => {
                   <Editor
                     value={shortDesc}
                     onTextChange={(e) => setShortDesc(e.htmlValue)}
-                    style={{ height: '260px' }}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Long Description</Label>
-                  <Editor
-                    value={longDesc}
-                    onTextChange={(e) => setLongDesc(e.htmlValue)}
                     style={{ height: '260px' }}
                   />
                 </div>
@@ -1226,41 +1213,47 @@ const ProductForm = ({ isEdit: isEditMode }) => {
                                   key={attrIndex}
                                   className="flex items-center gap-1.5"
                                 >
-                                   {(() => {
-                                     const usedOptionIds = variant.attributes
-                                       .filter((a, i) => i !== attrIndex && a.option)
-                                       .map((a) => a.option);
-                                     return (
-                                       <Select
-                                         value={attr.option}
-                                         onValueChange={(value) => {
-                                           const updatedVariants = [...variants];
-                                           updatedVariants[index].attributes[
-                                             attrIndex
-                                           ].option = value;
-                                           updatedVariants[index].attributes[
-                                             attrIndex
-                                           ].value = '';
-                                           setVariants(updatedVariants);
-                                         }}
-                                       >
-                                         <SelectTrigger className="w-[120px]">
-                                           <SelectValue placeholder="Option" />
-                                         </SelectTrigger>
-                                         <SelectContent>
-                                           {productOptions.map((option) => (
-                                             <SelectItem
-                                               key={option._id}
-                                               value={option._id}
-                                               disabled={usedOptionIds.includes(option._id) && option._id !== attr.option}
-                                             >
-                                               {option.name}
-                                             </SelectItem>
-                                           ))}
-                                         </SelectContent>
-                                       </Select>
-                                     );
-                                   })()}
+                                  {(() => {
+                                    const usedOptionIds = variant.attributes
+                                      .filter(
+                                        (a, i) => i !== attrIndex && a.option,
+                                      )
+                                      .map((a) => a.option);
+                                    return (
+                                      <Select
+                                        value={attr.option}
+                                        onValueChange={(value) => {
+                                          const updatedVariants = [...variants];
+                                          updatedVariants[index].attributes[
+                                            attrIndex
+                                          ].option = value;
+                                          updatedVariants[index].attributes[
+                                            attrIndex
+                                          ].value = '';
+                                          setVariants(updatedVariants);
+                                        }}
+                                      >
+                                        <SelectTrigger className="w-[120px]">
+                                          <SelectValue placeholder="Option" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {productOptions.map((option) => (
+                                            <SelectItem
+                                              key={option._id}
+                                              value={option._id}
+                                              disabled={
+                                                usedOptionIds.includes(
+                                                  option._id,
+                                                ) && option._id !== attr.option
+                                              }
+                                            >
+                                              {option.name}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    );
+                                  })()}
                                   <Select
                                     value={attr.value}
                                     onValueChange={(value) => {

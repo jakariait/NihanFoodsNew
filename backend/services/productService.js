@@ -668,7 +668,6 @@ const getProductDetailsService = async ({ productId, variantId }) => {
       productId: product._id,
       name: product.name,
       shortDesc: product.shortDesc,
-      longDesc: product.longDesc,
       thumbnailImage: product.thumbnailImage,
       images: product.images,
       category: product.category,

@@ -408,6 +408,58 @@
   animation: bounce-slow 3s infinite;
 }
 
+/* Cash on delivery "Order Now" button — attention-grabbing but subtle */
+@keyframes codGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 color-mix(in oklab, var(--primaryColor) 40%, transparent),
+      0 4px 14px color-mix(in oklab, var(--primaryColor) 25%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 7px color-mix(in oklab, var(--primaryColor) 0%, transparent),
+      0 6px 18px color-mix(in oklab, var(--primaryColor) 35%, transparent);
+  }
+}
+
+.animate-cod-glow {
+  animation: codGlow 2.6s ease-in-out infinite;
+}
+
+@keyframes codShimmer {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(340%) skewX(-18deg);
+  }
+}
+
+.cod-shimmer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  pointer-events: none;
+  animation: codShimmer 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cod-glow,
+  .cod-shimmer {
+    animation: none;
+  }
+}
+
 html {
   scroll-behavior: smooth; /* Smooth scrolling globally */
   overflow-x: hidden;

@@ -4,12 +4,6 @@ import useProductStore from '../../store/useProductStore.js';
 import GeneralInfoStore from '../../store/GeneralInfoStore.js';
 import Skeleton from 'react-loading-skeleton';
 import LazySocialShareButtons from './LazySocialShareButtons.jsx';
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@/components/ui/accordion';
-import { ChevronDown as ExpandMoreIcon } from 'lucide-react';
 import ProductGallery from './ProductGallery.jsx';
 import ProductAddToCart from './ProductAddToCart.jsx';
 import ProductBreadcrumbs from './ProductBreadcrumbs.jsx';
@@ -148,7 +142,9 @@ const ProductDetails = () => {
       <div className="xl:container xl:mx-auto p-3">
         <div className="flex flex-col items-center justify-center pt-40 text-gray-500">
           <h1 className="text-2xl font-semibold mb-2">Product Not Found</h1>
-          <p>The product you are looking for does not exist or has been removed.</p>
+          <p>
+            The product you are looking for does not exist or has been removed.
+          </p>
         </div>
       </div>
     );
@@ -201,12 +197,6 @@ const ProductDetails = () => {
             <div className="flex flex-col gap-3 md:col-span-4 lg:col-span-3 xl:col-span-4 pt-4 md:pt-0">
               <ProductAddToCart product={product} />
 
-              {/*Social Share Buttons*/}
-              <div className="flex items-center gap-2">
-                <h1>Social Share:</h1>
-                <LazySocialShareButtons url={url} title={title} />
-              </div>
-
               {/*Short Description*/}
               {product.shortDesc && (
                 <div
@@ -216,6 +206,12 @@ const ProductDetails = () => {
                   }}
                 />
               )}
+
+              {/*Social Share Buttons*/}
+              <div className="flex items-center gap-2">
+                <h1>Social Share:</h1>
+                <LazySocialShareButtons url={url} title={title} />
+              </div>
             </div>
           </div>
 
@@ -236,57 +232,6 @@ const ProductDetails = () => {
             </div>
           )}
 
-          <div className={'xl:w-3/4 mx-auto  mt-4 flex flex-col gap-4'}>
-            {/*product Description*/}
-            {product.longDesc && (
-              <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  Description
-                </AccordionSummary>
-                <AccordionDetails style={{ minHeight: '20rem' }}>
-                  <div
-                    className="rendered-html"
-                    dangerouslySetInnerHTML={{
-                      __html: cleanHtml(product.longDesc),
-                    }}
-                  />
-                </AccordionDetails>
-              </Accordion>
-            )}
-            {/*Product Size Chart*/}
-            {product.sizeChart && (
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  Size Chart
-                </AccordionSummary>
-                <AccordionDetails style={{ minHeight: '20rem' }}>
-                  <div
-                    className="rendered-html"
-                    dangerouslySetInnerHTML={{
-                      __html: cleanHtml(product.sizeChart),
-                    }}
-                  />
-                </AccordionDetails>
-              </Accordion>
-            )}
-
-            {/*Shipping and Return*/}
-            {product.shippingReturn && (
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  Shipping and Return
-                </AccordionSummary>
-                <AccordionDetails style={{ minHeight: '20rem' }}>
-                  <div
-                    className="rendered-html"
-                    dangerouslySetInnerHTML={{
-                      __html: cleanHtml(product.shippingReturn),
-                    }}
-                  />
-                </AccordionDetails>
-              </Accordion>
-            )}
-          </div>
           <div>
             <Suspense fallback={<Skeleton height={200} width={'100%'} />}>
               <RecentlyViewedProducts

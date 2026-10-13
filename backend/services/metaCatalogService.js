@@ -157,7 +157,6 @@ const buildCatalogItem = (product, variant = null) => {
 
   const description =
     cleanDescription(product.metaDescription) ||
-    cleanDescription(product.longDesc) ||
     cleanDescription(product.name);
 
   const additionalImages = getAdditionalImages(product);
@@ -268,7 +267,6 @@ const streamCatalogCSV = async (res) => {
         'name',
         'slug',
         'metaDescription',
-        'longDesc',
         'productCode',
         'thumbnailImage',
         'images',

@@ -69,7 +69,6 @@ const productSchema = new mongoose.Schema(
     name: { type: String, trim: true, required: true },
     slug: { type: String, trim: true, unique: true }, // Auto-generated
     shortDesc: { type: String, trim: true },
-    longDesc: { type: String, trim: true },
     productCode: { type: String, trim: true },
 
     rewardPoints: {

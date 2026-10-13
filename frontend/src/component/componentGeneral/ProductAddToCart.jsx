@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus } from 'react-icons/fa6';
+import { FaPlus, FaArrowRight } from 'react-icons/fa6';
 import { FiMinus } from 'react-icons/fi';
 import { FaTruck } from 'react-icons/fa';
 
@@ -180,9 +180,7 @@ const ProductAddToCart = ({ product }) => {
     addToCart(product, quantity, selectedVariant);
     setValidationMessage(''); // Clear message on success
 
-    const galleryImg = document.querySelector(
-      '[data-product-gallery] img',
-    );
+    const galleryImg = document.querySelector('[data-product-gallery] img');
     flyToCart(
       galleryImg || e?.currentTarget,
       galleryImg?.src || product.thumbnailImage,
@@ -243,6 +241,15 @@ const ProductAddToCart = ({ product }) => {
   const cleanHtml = (html) => sanitizeHtml(html);
 
   const variantForPrice = selectedVariant || product.variants?.[0];
+
+  const orderTotal =
+    (selectedVariant?.discount > 0
+      ? selectedVariant.discount
+      : selectedVariant?.price
+        ? selectedVariant.price
+        : product.finalDiscount > 0
+          ? product.finalDiscount
+          : product.finalPrice) * quantity;
 
   return (
     <div>
@@ -315,12 +322,20 @@ const ProductAddToCart = ({ product }) => {
             )}
 
             {product.productCode && (
-              <div className={'bg-gray-100 px-3 py-1.5 rounded text-sm md:text-base'}>
+              <div
+                className={
+                  'bg-gray-100 px-3 py-1.5 rounded text-sm md:text-base'
+                }
+              >
                 <strong>Product Code:</strong> {product.productCode}
               </div>
             )}
             {product.rewardPoints && (
-              <div className={'bg-gray-100 px-3 py-1.5 rounded text-sm md:text-base'}>
+              <div
+                className={
+                  'bg-gray-100 px-3 py-1.5 rounded text-sm md:text-base'
+                }
+              >
                 Purchase & Earn: {product.rewardPoints} points.
               </div>
             )}
@@ -409,7 +424,8 @@ const ProductAddToCart = ({ product }) => {
           {selectedVariant?.stock !== 0 && (
             <div className={'flex items-center justify-center'}>
               <button
-                className="primaryBgColor flex-1   accentTextColor px-2 py-1 md:py-2 rounded cursor-pointer"
+                type="button"
+                className="group relative w-full overflow-hidden primaryBgGradient accentTextColor rounded-xl px-4 py-2.5 md:py-3 cursor-pointer text-left transition-transform duration-200 active:scale-[0.98] animate-cod-glow"
                 onClick={() => {
                   if (product.variants?.length > 0 && !selectedVariant) {
                     const requiredOptions = options.map((o) => o.name);
@@ -432,7 +448,25 @@ const ProductAddToCart = ({ product }) => {
                   setValidationMessage('');
                 }}
               >
-                Order With Cash On Delivery
+                <span className="cod-shimmer" aria-hidden="true" />
+                <span className="relative z-10 flex items-center justify-between gap-3">
+                  <span className="flex flex-col min-w-0">
+                    <span className="text-base md:text-lg font-bold leading-tight">
+                      Order Now
+                    </span>
+                    <span className="text-[11px] md:text-xs leading-tight opacity-85">
+                      Cash on Delivery · Pay when you receive
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2 shrink-0">
+                    <span className="text-lg md:text-xl font-extrabold tabular-nums">
+                      ৳{formatPrice(orderTotal)}
+                    </span>
+                    <span className="rounded-full bg-white/20 p-1.5 transition-transform duration-200 group-hover:translate-x-0.5">
+                      <FaArrowRight className="text-xs md:text-sm" />
+                    </span>
+                  </span>
+                </span>
               </button>
             </div>
           )}
