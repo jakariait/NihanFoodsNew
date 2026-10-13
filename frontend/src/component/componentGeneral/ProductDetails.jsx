@@ -8,9 +8,14 @@ import ProductGallery from './ProductGallery.jsx';
 import ProductAddToCart from './ProductAddToCart.jsx';
 import ProductBreadcrumbs from './ProductBreadcrumbs.jsx';
 import ProductBenefits from '../componentGeneral/ProductBenefits.jsx';
+import HowToUse from '../componentGeneral/HowToUse.jsx';
+import Ingredients from '../componentGeneral/Ingredients.jsx';
+import Precautions from '../componentGeneral/Precautions.jsx';
+import ShortDescription from '../componentGeneral/ShortDescription.jsx';
 
 import ProductDetailsSkeleton from '../skeleton/ProductDetailsSkeleton.jsx';
 import sanitizeHtml from '../../utils/sanitizeHtml.js';
+import { FaLeaf } from 'react-icons/fa';
 const SimilarProducts = lazy(() => import('./SimilarProducts.jsx'));
 const YouTubeEmbed = lazy(() => import('./YouTubeEmbed.jsx'));
 const RecentlyViewedProducts = lazy(
@@ -201,14 +206,39 @@ const ProductDetails = () => {
 
               {/*Short Description*/}
               {product.shortDesc && (
-                <div
-                  className="rendered-html"
-                  dangerouslySetInnerHTML={{
-                    __html: cleanHtml(product.shortDesc),
-                  }}
-                />
+                <section className="rounded-2xl border border-[#2E7D31]/15 bg-[#F4FAF4] p-4 md:p-5">
+                  {/* Header */}
+                  <div className="flex items-center gap-2.5 mb-3 md:mb-4">
+                    <span className="flex h-8 w-8 md:h-9 md:w-9 shrink-0 items-center justify-center rounded-full bg-[#2E7D31] text-white">
+                      <FaLeaf className="text-sm md:text-base" />
+                    </span>
+                    <h2 className="text-base md:text-xl font-semibold leading-tight text-gray-900">
+                      About this product
+                    </h2>
+                  </div>
+
+                  {/* Content */}
+                  <div className="rounded-xl border border-[#2E7D31]/15 bg-white p-3 md:p-4 shadow-sm">
+                    <div
+                      className="rendered-html prose prose-sm md:prose-base max-w-none text-gray-700
+          prose-p:my-1.5 prose-p:leading-relaxed
+          prose-strong:text-gray-900
+          prose-ul:my-1.5 prose-ul:pl-5 prose-li:my-0.5
+          prose-li:marker:text-[#2E7D31]
+          prose-a:text-[#2E7D31] prose-a:underline prose-a:underline-offset-2"
+                      dangerouslySetInnerHTML={{
+                        __html: cleanHtml(product.shortDesc),
+                      }}
+                    />
+                  </div>
+                </section>
               )}
+
               <ProductBenefits product={product} />
+              <HowToUse product={product} />
+
+              <Ingredients product={product} />
+              <Precautions product={product} />
 
               {/*Social Share Buttons*/}
               <div className="flex items-center gap-2">

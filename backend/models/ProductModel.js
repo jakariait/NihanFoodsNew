@@ -101,6 +101,9 @@ const productSchema = new mongoose.Schema(
     metaKeywords: [{ type: String, trim: true }],
     searchTags: [{ type: String, trim: true }],
     benefits: [{ type: String, trim: true }],
+    howToUse: [{ type: String, trim: true }],
+    ingredients: [{ type: String, trim: true }],
+    precautions: [{ type: String, trim: true }],
 
     thumbnailImage: { type: String, trim: true, required: true },
     images: [{ type: String, trim: true, required: true }],

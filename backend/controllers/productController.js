@@ -11,6 +11,9 @@ const createProduct = async (req, res) => {
 
     // Empty string is sent when all benefits are removed
     if (productData.benefits === '') productData.benefits = [];
+    if (productData.howToUse === '') productData.howToUse = [];
+    if (productData.ingredients === '') productData.ingredients = [];
+    if (productData.precautions === '') productData.precautions = [];
 
     // Check if thumbnailImage is uploaded
     if (req.files && req.files.thumbnailImage) {
@@ -209,6 +212,9 @@ const updateProduct = async (req, res) => {
 
     // Empty string is sent when all benefits are removed
     if (updatedData.benefits === '') updatedData.benefits = [];
+    if (updatedData.howToUse === '') updatedData.howToUse = [];
+    if (updatedData.ingredients === '') updatedData.ingredients = [];
+    if (updatedData.precautions === '') updatedData.precautions = [];
     const files = req.files; // Get uploaded files
 
     // Call the service with `files`

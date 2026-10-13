@@ -83,6 +83,12 @@ const ProductForm = ({ isEdit: isEditMode }) => {
   const [tagInput, setTagInput] = useState('');
   const [benefits, setBenefits] = useState([]);
   const [benefitInput, setBenefitInput] = useState('');
+  const [howToUse, setHowToUse] = useState([]);
+  const [howToUseInput, setHowToUseInput] = useState('');
+  const [ingredients, setIngredients] = useState([]);
+  const [ingredientInput, setIngredientInput] = useState('');
+  const [precautions, setPrecautions] = useState([]);
+  const [precautionInput, setPrecautionInput] = useState('');
   const [thumbnailImage, setThumbnailImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
@@ -137,6 +143,9 @@ const ProductForm = ({ isEdit: isEditMode }) => {
       setMetaKeywords(product.metaKeywords || []);
       setSearchTags(product.searchTags || []);
       setBenefits(product.benefits || []);
+      setHowToUse(product.howToUse || []);
+      setIngredients(product.ingredients || []);
+      setPrecautions(product.precautions || []);
       setFinalPrice(product.finalPrice || '');
       setFinalDiscount(product.finalDiscount || '');
       setFinalStock(product.finalStock || '');
@@ -367,6 +376,52 @@ const ProductForm = ({ isEdit: isEditMode }) => {
     setBenefits(benefits.filter((benefit) => benefit !== benefitToDelete));
   };
 
+  const handleAddHowToUse = (e) => {
+    if (e.key === 'Enter' && howToUseInput.trim() !== '') {
+      e.preventDefault();
+      if (!howToUse.includes(howToUseInput.trim())) {
+        setHowToUse([...howToUse, howToUseInput.trim()]);
+      }
+      setHowToUseInput('');
+    }
+  };
+
+  const handleDeleteHowToUse = (stepToDelete) => {
+    setHowToUse(howToUse.filter((step) => step !== stepToDelete));
+  };
+
+  const handleAddIngredient = (e) => {
+    if (e.key === 'Enter' && ingredientInput.trim() !== '') {
+      e.preventDefault();
+      if (!ingredients.includes(ingredientInput.trim())) {
+        setIngredients([...ingredients, ingredientInput.trim()]);
+      }
+      setIngredientInput('');
+    }
+  };
+
+  const handleDeleteIngredient = (ingredientToDelete) => {
+    setIngredients(
+      ingredients.filter((ingredient) => ingredient !== ingredientToDelete),
+    );
+  };
+
+  const handleAddPrecaution = (e) => {
+    if (e.key === 'Enter' && precautionInput.trim() !== '') {
+      e.preventDefault();
+      if (!precautions.includes(precautionInput.trim())) {
+        setPrecautions([...precautions, precautionInput.trim()]);
+      }
+      setPrecautionInput('');
+    }
+  };
+
+  const handleDeletePrecaution = (precautionToDelete) => {
+    setPrecautions(
+      precautions.filter((precaution) => precaution !== precautionToDelete),
+    );
+  };
+
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
     setSelectedSubCategory('');
@@ -504,6 +559,16 @@ const ProductForm = ({ isEdit: isEditMode }) => {
     metaKeywords.forEach((keyword) => formData.append('metaKeywords', keyword));
     benefits.forEach((benefit) => formData.append('benefits', benefit));
     if (benefits.length === 0) formData.append('benefits', '');
+    howToUse.forEach((step) => formData.append('howToUse', step));
+    if (howToUse.length === 0) formData.append('howToUse', '');
+    ingredients.forEach((ingredient) =>
+      formData.append('ingredients', ingredient),
+    );
+    if (ingredients.length === 0) formData.append('ingredients', '');
+    precautions.forEach((precaution) =>
+      formData.append('precautions', precaution),
+    );
+    if (precautions.length === 0) formData.append('precautions', '');
 
     if (thumbnailImage instanceof File) {
       formData.append('thumbnailImage', thumbnailImage);
@@ -589,6 +654,12 @@ const ProductForm = ({ isEdit: isEditMode }) => {
         setMetaKeywords([]);
         setBenefits([]);
         setBenefitInput('');
+        setHowToUse([]);
+        setHowToUseInput('');
+        setIngredients([]);
+        setIngredientInput('');
+        setPrecautions([]);
+        setPrecautionInput('');
         setThumbnailImage(null);
         setImagePreview('');
         setSelectedImages([]);
@@ -766,6 +837,123 @@ const ProductForm = ({ isEdit: isEditMode }) => {
                           <button
                             type="button"
                             onClick={() => handleDeleteBenefit(benefit)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <X className="size-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md border-0">
+              <CardHeader>
+                <CardTitle>How to Use</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="how-to-use-input">Add Step</Label>
+                  <Input
+                    id="how-to-use-input"
+                    placeholder="Type a step and press Enter"
+                    value={howToUseInput}
+                    onChange={(e) => setHowToUseInput(e.target.value)}
+                    onKeyDown={handleAddHowToUse}
+                  />
+                  {howToUse.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {howToUse.map((step, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="gap-1 pr-1"
+                        >
+                          <span className="text-muted-foreground">
+                            {index + 1}.
+                          </span>
+                          {step}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHowToUse(step)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <X className="size-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md border-0">
+              <CardHeader>
+                <CardTitle>Ingredients</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="ingredient-input">Add Ingredient</Label>
+                  <Input
+                    id="ingredient-input"
+                    placeholder="Type an ingredient and press Enter"
+                    value={ingredientInput}
+                    onChange={(e) => setIngredientInput(e.target.value)}
+                    onKeyDown={handleAddIngredient}
+                  />
+                  {ingredients.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {ingredients.map((ingredient, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="gap-1 pr-1"
+                        >
+                          {ingredient}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteIngredient(ingredient)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <X className="size-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md border-0">
+              <CardHeader>
+                <CardTitle>Precautions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="precaution-input">Add Precaution</Label>
+                  <Input
+                    id="precaution-input"
+                    placeholder="Type a precaution and press Enter"
+                    value={precautionInput}
+                    onChange={(e) => setPrecautionInput(e.target.value)}
+                    onKeyDown={handleAddPrecaution}
+                  />
+                  {precautions.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {precautions.map((precaution, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="gap-1 pr-1"
+                        >
+                          {precaution}
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePrecaution(precaution)}
                             className="ml-1 hover:text-destructive"
                           >
                             <X className="size-3" />
