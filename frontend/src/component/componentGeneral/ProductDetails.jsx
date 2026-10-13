@@ -7,6 +7,8 @@ import LazySocialShareButtons from './LazySocialShareButtons.jsx';
 import ProductGallery from './ProductGallery.jsx';
 import ProductAddToCart from './ProductAddToCart.jsx';
 import ProductBreadcrumbs from './ProductBreadcrumbs.jsx';
+import ProductBenefits from '../componentGeneral/ProductBenefits.jsx';
+
 import ProductDetailsSkeleton from '../skeleton/ProductDetailsSkeleton.jsx';
 import sanitizeHtml from '../../utils/sanitizeHtml.js';
 const SimilarProducts = lazy(() => import('./SimilarProducts.jsx'));
@@ -187,14 +189,14 @@ const ProductDetails = () => {
           <ProductBreadcrumbs product={product} />
 
           <div className="md:grid md:grid-cols-8 lg:grid-cols-9 xl:grid-cols-9 gap-8">
-            <div className="md:col-span-4 lg:col-span-6 xl:col-span-5 relative">
+            <div className="md:col-span-3 lg:col-span-5 xl:col-span-4 relative">
               <ProductGallery
                 images={product.images}
                 discount={discountPercentage}
                 productName={product.name}
               />
             </div>
-            <div className="flex flex-col gap-3 md:col-span-4 lg:col-span-3 xl:col-span-4 pt-4 md:pt-0">
+            <div className="flex flex-col gap-3 md:col-span-5 lg:col-span-4 xl:col-span-5 pt-4 md:pt-0">
               <ProductAddToCart product={product} />
 
               {/*Short Description*/}
@@ -206,6 +208,7 @@ const ProductDetails = () => {
                   }}
                 />
               )}
+              <ProductBenefits product={product} />
 
               {/*Social Share Buttons*/}
               <div className="flex items-center gap-2">

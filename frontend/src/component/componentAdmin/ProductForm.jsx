@@ -81,6 +81,8 @@ const ProductForm = ({ isEdit: isEditMode }) => {
   const [keywordInput, setKeywordInput] = useState('');
   const [searchTags, setSearchTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
+  const [benefits, setBenefits] = useState([]);
+  const [benefitInput, setBenefitInput] = useState('');
   const [thumbnailImage, setThumbnailImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
@@ -134,6 +136,7 @@ const ProductForm = ({ isEdit: isEditMode }) => {
       setMetaDescription(product.metaDescription || '');
       setMetaKeywords(product.metaKeywords || []);
       setSearchTags(product.searchTags || []);
+      setBenefits(product.benefits || []);
       setFinalPrice(product.finalPrice || '');
       setFinalDiscount(product.finalDiscount || '');
       setFinalStock(product.finalStock || '');
@@ -350,6 +353,20 @@ const ProductForm = ({ isEdit: isEditMode }) => {
     setSearchTags(searchTags.filter((tag) => tag !== tagToDelete));
   };
 
+  const handleAddBenefit = (e) => {
+    if (e.key === 'Enter' && benefitInput.trim() !== '') {
+      e.preventDefault();
+      if (!benefits.includes(benefitInput.trim())) {
+        setBenefits([...benefits, benefitInput.trim()]);
+      }
+      setBenefitInput('');
+    }
+  };
+
+  const handleDeleteBenefit = (benefitToDelete) => {
+    setBenefits(benefits.filter((benefit) => benefit !== benefitToDelete));
+  };
+
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
     setSelectedSubCategory('');
@@ -485,6 +502,8 @@ const ProductForm = ({ isEdit: isEditMode }) => {
     selectedFlags.forEach((flag) => formData.append('flags', flag));
     searchTags.forEach((tag) => formData.append('searchTags', tag));
     metaKeywords.forEach((keyword) => formData.append('metaKeywords', keyword));
+    benefits.forEach((benefit) => formData.append('benefits', benefit));
+    if (benefits.length === 0) formData.append('benefits', '');
 
     if (thumbnailImage instanceof File) {
       formData.append('thumbnailImage', thumbnailImage);
@@ -568,6 +587,8 @@ const ProductForm = ({ isEdit: isEditMode }) => {
         setSelectedFlags([]);
         setSearchTags([]);
         setMetaKeywords([]);
+        setBenefits([]);
+        setBenefitInput('');
         setThumbnailImage(null);
         setImagePreview('');
         setSelectedImages([]);
@@ -715,6 +736,44 @@ const ProductForm = ({ isEdit: isEditMode }) => {
                     value={videoUrl}
                     onChange={(e) => setVideoUrl(e.target.value)}
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md border-0">
+              <CardHeader>
+                <CardTitle>Benefits</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="benefit-input">Add Benefit</Label>
+                  <Input
+                    id="benefit-input"
+                    placeholder="Type a benefit and press Enter"
+                    value={benefitInput}
+                    onChange={(e) => setBenefitInput(e.target.value)}
+                    onKeyDown={handleAddBenefit}
+                  />
+                  {benefits.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {benefits.map((benefit, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="gap-1 pr-1"
+                        >
+                          {benefit}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteBenefit(benefit)}
+                            className="ml-1 hover:text-destructive"
+                          >
+                            <X className="size-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -6,6 +6,7 @@ import { FaTruck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../../store/useCartStore.js';
 import WishlistButton from './WishlistButton.jsx';
+import OrderByPhoneWhatsapp from './OrderByPhoneWhatsapp.jsx';
 import sanitizeHtml from '../../utils/sanitizeHtml.js';
 import { flyToCart } from '../../utils/flyToCart.js';
 
@@ -469,6 +470,13 @@ const ProductAddToCart = ({ product }) => {
                 </span>
               </button>
             </div>
+          )}
+          {(!product.variants?.length || selectedVariant) && (
+            <OrderByPhoneWhatsapp
+              product={product}
+              quantity={quantity}
+              price={orderTotal}
+            />
           )}
         </div>
       </div>
