@@ -18,12 +18,7 @@ const createOrder = async (orderData, userId) => {
     }
 
     // Generate order number
-    const counter = await OrderCounter.findOneAndUpdate(
-      { id: 'order' },
-      { $inc: { seq: 1 } },
-      { new: true, upsert: true }
-    );
-    const orderNo = String(counter.seq).padStart(6, '0');
+    const orderNo = await generateOrderNo();
 
     // Get VAT
     const vatEntry = await VatPercentage.findOne().sort({ createdAt: -1 });
@@ -136,12 +131,46 @@ const createOrder = async (orderData, userId) => {
       adminNote: orderData.adminNote || '',
     });
 
-    const savedOrder = await newOrder.save();
+    // Retry only the save (never the stock decrements) if orderNo collides
+    let savedOrder;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        savedOrder = await newOrder.save();
+        break;
+      } catch (error) {
+        const isOrderNoDup =
+          (error.code === 11000 || error.code === 11001) &&
+          String(error.message || '').includes('orderNo');
+
+        if (!isOrderNoDup || attempt === 2) throw error;
+
+        await resyncOrderCounter();
+        newOrder.orderNo = await generateOrderNo();
+      }
+    }
 
     return savedOrder;
   } catch (error) {
     throw new Error(error.message);
   }
+};
+
+const generateOrderNo = async () => {
+  const counter = await OrderCounter.findOneAndUpdate(
+    { id: 'order' },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return String(counter.seq).padStart(6, '0');
+};
+
+const resyncOrderCounter = async () => {
+  const latest = await Order.findOne({}, { orderNo: 1, _id: 0 }).sort({ orderNo: -1 });
+  const maxSeq = latest ? parseInt(latest.orderNo, 10) : 0;
+
+  if (Number.isNaN(maxSeq)) return;
+
+  await OrderCounter.findOneAndUpdate({ id: 'order' }, { $max: { seq: maxSeq } }, { upsert: true });
 };
 
 const getAllOrders = async (filter = {}, page, limit, search = '', startDate, endDate) => {

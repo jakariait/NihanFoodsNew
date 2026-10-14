@@ -173,6 +173,15 @@ const bulkDeleteAbandonedCarts = async (cartIds) => {
   }
 };
 
+const resyncOrderCounter = async () => {
+  const latest = await Order.findOne({}, { orderNo: 1, _id: 0 }).sort({ orderNo: -1 });
+  const maxSeq = latest ? parseInt(latest.orderNo, 10) : 0;
+
+  if (Number.isNaN(maxSeq)) return;
+
+  await OrderCounter.findOneAndUpdate({ id: 'order' }, { $max: { seq: maxSeq } }, { upsert: true });
+};
+
 const convertToOrder = async (cartId, orderData) => {
   try {
     const cart = await AbandonedCart.findById(cartId);
@@ -273,7 +282,27 @@ const convertToOrder = async (cartId, orderData) => {
       adminNote: '',
     });
 
-    const savedOrder = await newOrder.save();
+    let savedOrder;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        savedOrder = await newOrder.save();
+        break;
+      } catch (error) {
+        const isOrderNoDup =
+          (error.code === 11000 || error.code === 11001) &&
+          String(error.message || '').includes('orderNo');
+
+        if (!isOrderNoDup || attempt === 2) throw error;
+
+        await resyncOrderCounter();
+        const counter = await OrderCounter.findOneAndUpdate(
+          { id: 'order' },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        newOrder.orderNo = String(counter.seq).padStart(6, '0');
+      }
+    }
 
     await AbandonedCart.findByIdAndUpdate(cartId, {
       status: 'converted',
