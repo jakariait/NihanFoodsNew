@@ -438,9 +438,7 @@ const ProductAddToCart = ({ product }) => {
                 (opt) => !selectedOptions[opt],
               );
               if (missingOptions.length > 0) {
-                setValidationMessage(
-                  `${missingOptions.join(' / ')} required!`,
-                );
+                setValidationMessage(`${missingOptions.join(' / ')} required!`);
               } else if (product.variants?.length > 0) {
                 setValidationMessage('Please select all variant options.');
               }
@@ -462,9 +460,9 @@ const ProductAddToCart = ({ product }) => {
               </span>
             </span>
             <span className="flex items-center gap-2 shrink-0">
-              <span className="text-lg md:text-xl font-extrabold tabular-nums">
-                ৳{formatPrice(orderTotal)}
-              </span>
+              {/*<span className="text-lg md:text-xl font-extrabold tabular-nums">*/}
+              {/*  ৳{formatPrice(orderTotal)}*/}
+              {/*</span>*/}
               <span className="rounded-full bg-white/20 p-1.5 transition-transform duration-200 group-hover:translate-x-0.5">
                 <FaArrowRight className="text-xs md:text-sm" />
               </span>
