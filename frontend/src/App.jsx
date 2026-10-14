@@ -23,7 +23,7 @@ import ScrollToTopButton from './component/componentGeneral/ScrollToTopButton.js
 import { setFaviconFromApi } from './utils/setFavicon.js';
 import Loading from './component/skeleton/Loading.jsx';
 import AdminLoading from './component/skeleton/AdminLoading.jsx';
-
+import Akherlalchini from './component/componentGeneral/Akherlalchini.jsx';
 import UserLayout from './component/componentGeneral/UserLayout.jsx';
 const LayoutAdmin = lazy(
   () => import('./component/componentAdmin/LayoutAdmin.jsx'),
@@ -243,6 +243,8 @@ function App() {
             <Route path="/blogs/:slug" element={<BlogDetailsPage />} />
             <Route path="/forgot-password" element={<ForgetPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/landing" element={<Akherlalchini />} />
+
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>
