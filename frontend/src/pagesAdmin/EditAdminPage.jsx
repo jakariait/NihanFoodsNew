@@ -12,6 +12,7 @@ const EditAdminPage = () => {
   return (
     <RequirePermission permission="admin-users">
       <EditAdmin />
+
     </RequirePermission>
   );
 };
