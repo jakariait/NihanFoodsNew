@@ -324,6 +324,7 @@ const AddBlog = () => {
         <div className="flex justify-center pb-6">
           <Button type="submit">Create Blog</Button>
         </div>
+        
       </form>
     </div>
   );
