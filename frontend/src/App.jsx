@@ -243,11 +243,12 @@ function App() {
             <Route path="/blogs/:slug" element={<BlogDetailsPage />} />
             <Route path="/forgot-password" element={<ForgetPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/landing" element={<Akherlalchini />} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>
+
+        <Route path="/landing" element={<Akherlalchini />} />
 
         <Route path="/admin/login" element={<AdminLogin />} />
 

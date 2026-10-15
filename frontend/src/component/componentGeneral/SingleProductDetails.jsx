@@ -9,6 +9,7 @@ import BenefitsCTASection from './BenefitsCTASection.jsx';
 import SectionBackground from './SectionBackground.jsx';
 import ProductCarousel from './ProductCarousel.jsx';
 import CountDown from './CountDown.jsx';
+import FoterLanding from './FoterLanding.jsx';
 
 const SingleProductDetails = ({ slug }) => {
   const hasPushedRef = useRef(false);
@@ -87,6 +88,7 @@ const SingleProductDetails = ({ slug }) => {
             <ProductCarousel />
             <CountDown />
             <SinglePageCheckout product={product} />
+            <FoterLanding />
           </SectionBackground>
         </div>
       )}
