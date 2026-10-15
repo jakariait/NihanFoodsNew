@@ -111,7 +111,6 @@ const AddressForm = ({ user, onAddressChange }) => {
           onChange={handleChange}
         />
       </div>
-      
     </div>
   );
 };

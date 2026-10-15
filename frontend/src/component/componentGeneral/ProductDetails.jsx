@@ -216,7 +216,7 @@ const ProductDetails = () => {
           <meta property="og:url" content={window.location.href} />
           <link
             rel="canonical"
-            href={`https://ecommerce.digiwebdigital.com/product/${slug}`}
+            href={`https://nihansuperfood.com/product/${slug}`}
           />
 
           {/*BreadCrumbs*/}
@@ -261,7 +261,9 @@ const ProductDetails = () => {
                           style={{
                             width: `${Math.min(
                               100,
-                              Math.round((cartTotal / freeDeliveryAmount) * 100),
+                              Math.round(
+                                (cartTotal / freeDeliveryAmount) * 100,
+                              ),
                             )}%`,
                           }}
                         />
