@@ -102,7 +102,7 @@ const FooterBottom = ({ generalInfo }) => (
     <p>
       Design and Developed by{' '}
       <a
-        href="https://www.digiweb.digital/"
+        href="https://www.digiwebigital.com/"
         className={'text-green-500 hover:underline'}
       >
         DigiWeb
