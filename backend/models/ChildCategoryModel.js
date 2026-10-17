@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const CounterModel = require('./ChildCategoryCounter'); // Assuming it's the same for auto-increment
-const slugify = require('slugify');
+const createSlug = require('../utility/createSlug');
 
 const childCategorySchema = new mongoose.Schema(
   {
@@ -38,7 +38,7 @@ childCategorySchema.pre('save', async function (next) {
       );
 
       this.categoryId = counter.value;
-      this.slug = slugify(`${this.name}-${this.categoryId}`, { lower: true });
+      this.slug = createSlug(`${this.name}-${this.categoryId}`);
 
       next();
     } catch (error) {

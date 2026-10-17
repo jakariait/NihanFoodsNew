@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const CounterModel = require('./CounterModel');
-const slugify = require('slugify');
+const createSlug = require('../utility/createSlug');
 
 const attributeSchema = new mongoose.Schema(
   {
@@ -189,7 +189,7 @@ productSchema.pre('validate', async function (next) {
 
   // Generate slug when name changes
   if (this.isModified('name') || this.isNew) {
-    this.slug = `${slugify(this.name, { lower: true })}-${this.productId}`;
+    this.slug = `${createSlug(this.name)}-${this.productId}`;
   }
 
   next();

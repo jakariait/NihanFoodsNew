@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const CounterModel = require('./BlogCounterModel');
-const slugify = require('slugify');
+const createSlug = require('../utility/createSlug');
 
 const blogSchema = new mongoose.Schema(
   {
@@ -43,7 +43,7 @@ blogSchema.pre('validate', async function (next) {
 
   // Generate slug when name changes
   if (this.isModified('name') || this.isNew) {
-    this.slug = `${slugify(this.name, { lower: true })}-${this.blogId}`;
+    this.slug = `${createSlug(this.name)}-${this.blogId}`;
   }
 
   next();

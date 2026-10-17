@@ -1,7 +1,7 @@
 const SubCategory = require('../models/SubCategoryModel');
 const CounterModel = require('../models/CategoryCounterModel');
 const { attachProductCounts } = require('./productCountService');
-const slugify = require('slugify');
+const createSlug = require('../utility/createSlug');
 const fs = require('fs');
 const path = require('path');
 
@@ -24,9 +24,7 @@ const createSubCategory = async (subCategoryData) => {
     );
 
     subCategoryData.categoryId = counter.value;
-    subCategoryData.slug = slugify(`${subCategoryData.name}-${subCategoryData.categoryId}`, {
-      lower: true,
-    });
+    subCategoryData.slug = createSlug(`${subCategoryData.name}-${subCategoryData.categoryId}`);
 
     const subCategory = await SubCategory.create(subCategoryData);
     return subCategory;
@@ -77,7 +75,7 @@ const updateSubCategory = async (id, updatedData) => {
     delete updatedData.removeImage;
 
     if (updatedData.name) {
-      updatedData.slug = slugify(`${updatedData.name}-${id}`, { lower: true });
+      updatedData.slug = createSlug(`${updatedData.name}-${id}`);
     }
 
     const subCategory = await SubCategory.findByIdAndUpdate(id, updatedData, { new: true })

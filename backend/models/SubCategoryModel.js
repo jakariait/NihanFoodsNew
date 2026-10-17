@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const slugify = require('slugify');
+const createSlug = require('../utility/createSlug');
 const CounterModel = require('./CategoryCounterModel');
 
 const subCategorySchema = new mongoose.Schema(
@@ -33,7 +33,7 @@ subCategorySchema.pre('save', async function (next) {
       );
 
       this.categoryId = counter.value;
-      this.slug = slugify(`${this.name}-${this.categoryId}`, { lower: true });
+      this.slug = createSlug(`${this.name}-${this.categoryId}`);
 
       next();
     } catch (error) {
