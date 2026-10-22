@@ -249,7 +249,7 @@ function App() {
         </Route>
 
         <Route
-          path="/হাতে-তৈরি-আখের-গুড়ের-লাল-চিনি"
+          path="/akher-lal-chiini"
           element={<Akherlalchini />}
         />
 
