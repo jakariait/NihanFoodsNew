@@ -248,7 +248,10 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="/landing" element={<Akherlalchini />} />
+        <Route
+          path="/হাতে-তৈরি-আখের-গুড়ের-লাল-চিনি-445"
+          element={<Akherlalchini />}
+        />
 
         <Route path="/admin/login" element={<AdminLogin />} />
 
