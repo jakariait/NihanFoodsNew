@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ResponsiveBar } from '@nivo/bar';
 import useOrderStore from '../../store/useOrderStore';
 import dayjs from 'dayjs';
 
 const MonthlyOrderStatusGroupedChart = () => {
-  const { fetchAllOrdersWithoutPagination, allOrders } = useOrderStore();
+  const { chartOrders } = useOrderStore();
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    fetchAllOrdersWithoutPagination();
-  }, [fetchAllOrdersWithoutPagination]);
-
-  useEffect(() => {
-    if (allOrders.length === 0) return;
+    if (chartOrders.length === 0) return;
 
     const now = dayjs();
     const monthlyData = {};
@@ -27,7 +23,7 @@ const MonthlyOrderStatusGroupedChart = () => {
       };
     }
 
-    allOrders.forEach((order) => {
+    chartOrders.forEach((order) => {
       const key = dayjs(order.createdAt).format('YYYY-MM');
       if (!monthlyData[key]) return;
 
@@ -42,7 +38,7 @@ const MonthlyOrderStatusGroupedChart = () => {
     });
 
     setChartData(Object.values(monthlyData));
-  }, [allOrders]);
+  }, [chartOrders]);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow overflow-hidden">

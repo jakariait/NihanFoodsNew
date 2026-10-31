@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useOrderStore from '../../store/useOrderStore.js';
@@ -97,7 +97,7 @@ const AllOrders = ({ title, status = '' }) => {
         setActiveStatus(urlStatus);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, activeStatus]);
 
   const handleTabChange = useCallback(
     (newStatus) => {
@@ -175,6 +175,7 @@ const AllOrders = ({ title, status = '' }) => {
   useEffect(() => {
     fetchOrders();
   }, [
+    fetchOrders,
     searchQuery,
     currentPage,
     itemsPerPage,
@@ -182,6 +183,12 @@ const AllOrders = ({ title, status = '' }) => {
     startDateFromStore,
     endDateFromStore,
   ]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleSearchInputChange = useCallback((e) => {
     setSearchInput(e.target.value);
@@ -952,6 +959,7 @@ const AllOrders = ({ title, status = '' }) => {
                           <TableCell>
                             <OrderStatusSelector
                               orderId={order._id}
+                              initialStatus={order.orderStatus || 'pending'}
                               refetchOrders={fetchOrders}
                             />
                           </TableCell>

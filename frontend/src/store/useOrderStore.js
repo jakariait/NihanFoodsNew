@@ -4,6 +4,9 @@ import useAuthAdminStore from './AuthAdminStore.js';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+let paginatedRequestId = 0;
+let chartOrdersInFlight = null;
+
 const useOrderStore = create((set, get) => ({
   // Status-wise orders and totals
   orderListByStatus: {
@@ -23,8 +26,10 @@ const useOrderStore = create((set, get) => ({
     cancelled: 0,
   },
 
-  // All orders regardless of status
+  // Paginated orders for the orders table
   allOrders: [],
+  // Unpaginated orders used only by dashboard charts
+  chartOrders: [],
   totalOrders: 0,
   totalPages: 1,
   currentPage: 1,
@@ -65,6 +70,7 @@ const useOrderStore = create((set, get) => ({
   fetchAllOrders: async (status = '', page = 1, limit = 10) => {
     const token = useAuthAdminStore.getState().token;
     const { searchQuery, startDate, endDate } = get(); // Get the current search query
+    const requestId = ++paginatedRequestId;
 
     set({
       orderListLoading: true,
@@ -103,6 +109,8 @@ const useOrderStore = create((set, get) => ({
         params,
       });
 
+      if (requestId !== paginatedRequestId) return;
+
       if (res.data.success) {
         const { orders, totalOrders, totalPages, currentPage } = res.data;
 
@@ -139,6 +147,7 @@ const useOrderStore = create((set, get) => ({
         });
       }
     } catch (error) {
+      if (requestId !== paginatedRequestId) return;
       set({
         orderListError:
           error.response?.data?.message || 'Failed to fetch orders',
@@ -148,75 +157,43 @@ const useOrderStore = create((set, get) => ({
   },
 
   fetchAllOrdersWithoutPagination: async (status = '', page, limit) => {
+    if (chartOrdersInFlight) return chartOrdersInFlight;
+
     const token = useAuthAdminStore.getState().token;
 
-    set({
-      orderListLoading: true,
-      orderListError: null,
-      currentStatus: status,
-    });
+    const params = {};
+    if (status) params.orderStatus = status;
+    if (page) params.page = page;
+    if (limit) params.limit = limit;
 
-    try {
-      const params = {};
-
-      // Add status filter if provided
-      if (status) {
-        params.orderStatus = status;
-      }
-
-      // Add pagination if provided
-      if (page) params.page = page;
-      if (limit) params.limit = limit;
-
-      const res = await axios.get(`${apiUrl}/orders`, {
+    const request = axios
+      .get(`${apiUrl}/orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
         params,
-      });
-
-      if (res.data.success) {
-        const { orders, totalOrders, totalPages, currentPage } = res.data;
-
-        if (status) {
-          set((state) => ({
-            orderListByStatus: {
-              ...state.orderListByStatus,
-              [status]: orders || [],
-            },
-            totalByStatus: {
-              ...state.totalByStatus,
-              [status]: totalOrders || 0,
-            },
-            totalOrders: totalOrders || 0,
-            totalPages: totalPages || 1,
-            currentPage: currentPage || 1,
-            itemsPerPage: limit || 10,
-            orderListLoading: false,
-          }));
-        } else {
-          set({
-            allOrders: orders || [],
-            totalOrders: totalOrders || 0,
-            totalPages: totalPages || 1,
-            currentPage: currentPage || 1,
-            itemsPerPage: limit || 10,
-            orderListLoading: false,
-          });
+      })
+      .then((res) => {
+        if (res.data.success) {
+          set({ chartOrders: res.data.orders || [] });
         }
-      } else {
-        set({
-          orderListError: 'Failed to fetch orders',
-          orderListLoading: false,
-        });
-      }
-    } catch (error) {
-      set({
-        orderListError:
-          error.response?.data?.message || 'Failed to fetch orders',
-        orderListLoading: false,
+        return res.data;
+      })
+      .catch((error) => {
+        console.error(
+          'Failed to fetch orders for charts:',
+          error.response?.data?.message || error.message,
+        );
+        return null;
+      })
+      .finally(() => {
+        if (chartOrdersInFlight === request) {
+          chartOrdersInFlight = null;
+        }
       });
-    }
+
+    chartOrdersInFlight = request;
+    return request;
   },
 
   fetchStatusCount: async (status) => {

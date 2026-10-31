@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import useCourierStatus from '../../store/useCourierStatus.js';
 import useAuthAdminStore from '../../store/AuthAdminStore.js';
+import usePathaoConfigStore from '../../store/usePathaoConfigStore.js';
 
 const SendToCourierButton = ({ orderData, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -35,27 +36,14 @@ const SendToCourierButton = ({ orderData, onSuccess }) => {
     refetch,
   } = useCourierStatus(orderData, sent, !sent);
   const [selectedCourier, setSelectedCourier] = useState('steadfast');
-  const [pathaoStoreId, setPathaoStoreId] = useState(null);
 
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuthAdminStore();
-
-  useEffect(() => {
-    const fetchPathaoConfig = async () => {
-      if (!token) return;
-      try {
-        const response = await axios.get(`${apiURL}/pathao-config`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.data && response.data.data) {
-          setPathaoStoreId(response.data.data.storeId);
-        }
-      } catch (error) {
-        console.error('Failed to fetch Pathao config:', error);
-      }
-    };
-    fetchPathaoConfig();
-  }, [apiURL, token]);
+  const {
+    storeId: pathaoStoreId,
+    loading: pathaoLoading,
+    fetchConfig: fetchPathaoConfig,
+  } = usePathaoConfigStore();
 
   const handleButtonClick = () => {
     if (sent) {
@@ -63,6 +51,18 @@ const SendToCourierButton = ({ orderData, onSuccess }) => {
       refetch();
     } else {
       setOpen(true);
+      fetchPathaoConfig(token);
+    }
+  };
+
+  const handleCourierChange = (value) => {
+    setSelectedCourier(value);
+    if (value === 'pathao') {
+      fetchPathaoConfig(token).then((storeId) => {
+        if (!storeId) {
+          toast.error('Pathao configuration is unavailable.');
+        }
+      });
     }
   };
 
@@ -241,7 +241,7 @@ const SendToCourierButton = ({ orderData, onSuccess }) => {
               <Label>Courier:</Label>
               <Select
                 value={selectedCourier}
-                onValueChange={setSelectedCourier}
+                onValueChange={handleCourierChange}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -302,7 +302,9 @@ const SendToCourierButton = ({ orderData, onSuccess }) => {
             <Button
               onClick={handleSend}
               disabled={
-                loading || (selectedCourier === 'pathao' && !pathaoStoreId)
+                loading ||
+                (selectedCourier === 'pathao' &&
+                  (pathaoLoading || !pathaoStoreId))
               }
             >
               {loading && <Loader2 className="size-4 animate-spin mr-2" />}

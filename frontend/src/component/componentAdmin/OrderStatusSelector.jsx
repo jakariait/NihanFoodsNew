@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useAuthAdminStore from '../../store/AuthAdminStore.js';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,16 +20,26 @@ const statusOptions = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
-const OrderStatusSelector = ({ orderId, refetchOrders }) => {
+const OrderStatusSelector = ({ orderId, refetchOrders, initialStatus }) => {
   const { token } = useAuthAdminStore();
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  const [loading, setLoading] = useState(true);
+  const hasInitialStatus = Boolean(initialStatus);
+  const [loading, setLoading] = useState(!hasInitialStatus);
   const [submitting, setSubmitting] = useState(false);
-  const [orderStatus, setOrderStatus] = useState('pending');
+  const [orderStatus, setOrderStatus] = useState(initialStatus || 'pending');
 
   useEffect(() => {
-    if (!orderId) return;
+    if (hasInitialStatus) {
+      setOrderStatus(initialStatus);
+      setLoading(false);
+      return;
+    }
+
+    if (!orderId || !token) {
+      setLoading(false);
+      return;
+    }
 
     const fetchOrderStatus = async () => {
       setLoading(true);
@@ -54,7 +64,7 @@ const OrderStatusSelector = ({ orderId, refetchOrders }) => {
     };
 
     fetchOrderStatus();
-  }, [orderId, apiUrl, token]);
+  }, [orderId, apiUrl, token, hasInitialStatus, initialStatus]);
 
   const handleSubmit = async () => {
     setSubmitting(true);

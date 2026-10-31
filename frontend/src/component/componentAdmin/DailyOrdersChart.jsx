@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ResponsiveLine } from '@nivo/line';
 import useOrderStore from '../../store/useOrderStore';
 import dayjs from 'dayjs';
 
 const DailyOrdersChart = () => {
-  const { fetchAllOrdersWithoutPagination, allOrders } = useOrderStore();
+  const { chartOrders } = useOrderStore();
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    fetchAllOrdersWithoutPagination();
-  }, [fetchAllOrdersWithoutPagination]);
-
-  useEffect(() => {
-    if (allOrders.length > 0) {
+    if (chartOrders.length > 0) {
       const today = dayjs();
       const past30Days = Array.from({ length: 30 }, (_, i) =>
         today.subtract(i, 'day').format('YYYY-MM-DD'),
@@ -23,7 +19,7 @@ const DailyOrdersChart = () => {
         return acc;
       }, {});
 
-      allOrders.forEach((order) => {
+      chartOrders.forEach((order) => {
         const orderDate = dayjs(order.orderDate).format('YYYY-MM-DD');
         if (orderCountMap[orderDate] !== undefined) {
           orderCountMap[orderDate]++;
@@ -42,7 +38,7 @@ const DailyOrdersChart = () => {
 
       setChartData(formattedData);
     }
-  }, [allOrders]);
+  }, [chartOrders]);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow overflow-hidden">

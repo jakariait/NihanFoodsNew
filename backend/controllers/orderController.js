@@ -204,8 +204,8 @@ const getOrdersForUser = async (req, res) => {
 
     const result = await orderService.getOrdersByUserId(userId);
 
-    if (!result || result.totalOrders === 0) {
-      return res.status(404).json({ success: false, message: 'No orders found for this user' });
+    if (!result) {
+      return res.status(200).json({ success: true, totalOrders: 0, orders: [] });
     }
 
     return res.status(200).json({

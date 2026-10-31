@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,7 +54,7 @@ const calculateDiscountPercentage = (
 
 const AdminNewOrderCreate = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const { fetchAllOrders } = useOrderStore();
+  const { refreshOrders } = useOrderStore();
 
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -158,7 +158,7 @@ const AdminNewOrderCreate = () => {
       if (res.data?.success) {
         setShippingOptions(res.data.data);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch shipping options');
     }
   };
@@ -172,7 +172,7 @@ const AdminNewOrderCreate = () => {
       } else {
         setVatPercentage(0);
       }
-    } catch (err) {
+    } catch {
       setVatPercentage(0);
     }
   };
@@ -374,7 +374,7 @@ const AdminNewOrderCreate = () => {
 
       if (res.data?.success) {
         toast.success('Order created successfully!');
-        fetchAllOrders();
+        refreshOrders();
         handleCloseDialog();
       }
     } catch (err) {

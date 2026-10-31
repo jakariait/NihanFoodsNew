@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import RequirePermission from '../component/componentAdmin/RequirePermission.jsx';
 import useBreadcrumbStore from '../store/BreadcrumbStore.js';
 import useOrderStore from '../store/useOrderStore.js';
@@ -28,31 +28,17 @@ const ChartFallback = () => (
 
 const DashboardPage = () => {
   const setBreadcrumb = useBreadcrumbStore((s) => s.setBreadcrumb);
+  const fetchChartOrders = useOrderStore(
+    (s) => s.fetchAllOrdersWithoutPagination,
+  );
+
   useEffect(() => {
     setBreadcrumb('WEBSITE CONFIG', 'Dashboard');
   }, []);
 
-  const { fetchAllOrders } = useOrderStore();
-
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await Promise.all([
-          fetchAllOrders(),
-          fetchAllOrders('pending'),
-          fetchAllOrders('approved'),
-          fetchAllOrders('intransit'),
-          fetchAllOrders('delivered'),
-          fetchAllOrders('returned'),
-          fetchAllOrders('cancelled'),
-        ]);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    fetchChartOrders();
+  }, [fetchChartOrders]);
 
   return (
     <div>

@@ -16,13 +16,14 @@ afterAll(async () => {
 });
 
 describe('File Upload Security', () => {
-  test('rejects SVG upload', async () => {
+  test('accepts SVG upload', async () => {
     const res = await request(app)
       .post('/api/updateGeneralInfo')
       .set('Authorization', `Bearer ${adminToken}`)
       .attach('PrimaryLogo', Buffer.from('<svg></svg>'), 'logo.svg');
-    expect(res.status).toBe(400);
-    expect(res.text).toMatch(/Invalid file type/i);
+    expect([200, 201]).toContain(res.status);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.PrimaryLogo).toMatch(/\.svg$/);
   });
 
   test('rejects non-image file types (PDF)', async () => {

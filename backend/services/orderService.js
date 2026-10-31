@@ -584,10 +584,6 @@ const getOrdersByUserId = async (userId) => {
 
     const totalOrders = orders.length;
 
-    if (totalOrders === 0) {
-      throw new Error('No orders found for this user');
-    }
-
     // Clean up and structure variants for all orders
     const updatedOrders = orders.map((order) => {
       const finalItems = order.items.map((item) => {

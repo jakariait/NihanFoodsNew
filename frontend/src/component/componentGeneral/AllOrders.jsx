@@ -1,21 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuthUserStore from '../../store/AuthUserStore.js';
 import { Button } from '@/components/ui/button';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { useNavigate } from 'react-router-dom';
-import {
-  Package,
-  Eye,
-  ShoppingBag,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { Eye, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const statusStyles = {
   pending: 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20',
   processing: 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20',
   approved: 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/20',
+  intransit: 'bg-violet-50 text-violet-700 ring-1 ring-violet-600/20',
   shipped: 'bg-violet-50 text-violet-700 ring-1 ring-violet-600/20',
   delivered: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20',
   cancelled: 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20',
@@ -28,35 +23,48 @@ const AllOrders = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const rowsPerPage = 8;
 
   const navigate = useNavigate();
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!user?._id) return;
     setLoading(true);
+    setError(null);
     try {
       const { data } = await axios.get(`${apiUrl}/ordersbyUser/${user._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (data.success) setOrders(data.orders || []);
     } catch (err) {
-      console.error('Error fetching orders:', err);
+      if (err.response?.status === 404) {
+        setOrders([]);
+      } else {
+        console.error('Error fetching orders:', err);
+        setError('Failed to load your orders. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiUrl, token, user?._id]);
 
   useEffect(() => {
     fetchOrders();
-  }, [user?._id, token]);
+  }, [fetchOrders]);
 
   const totalPages = Math.ceil(orders.length / rowsPerPage) || 1;
   const paginated = orders.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage,
   );
+
+  useEffect(() => {
+    if (page > 0 && page >= totalPages) {
+      setPage(totalPages - 1);
+    }
+  }, [page, totalPages]);
 
   return (
     <div className="space-y-5">
@@ -74,6 +82,16 @@ const AllOrders = () => {
       {loading ? (
         <div className="flex items-center justify-center py-32">
           <CircularProgress className="text-muted-foreground/40" size={28} />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-32 rounded-xl border border-dashed border-muted-foreground/20">
+          <p className="text-base font-medium mb-1">Could not load orders</p>
+          <p className="text-sm text-muted-foreground/70 mb-6 text-center max-w-xs">
+            {error}
+          </p>
+          <Button onClick={fetchOrders} size="sm">
+            Try again
+          </Button>
         </div>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 rounded-xl border border-dashed border-muted-foreground/20">

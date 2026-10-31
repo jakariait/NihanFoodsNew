@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { Button } from '@/components/ui/button';
 import useOrderStore from '../../store/useOrderStore.js';
@@ -12,34 +12,30 @@ const timeframeLabels = {
 };
 
 const MostSoldProductsPieChart = () => {
-  const { fetchAllOrdersWithoutPagination, allOrders } = useOrderStore();
+  const { chartOrders } = useOrderStore();
   const [productSales, setProductSales] = useState([]);
   const [totalSold, setTotalSold] = useState(0);
   const [timeframe, setTimeframe] = useState('monthly');
 
   useEffect(() => {
-    fetchAllOrdersWithoutPagination();
-  }, [fetchAllOrdersWithoutPagination]);
-
-  useEffect(() => {
-    if (allOrders.length > 0) {
+    if (chartOrders.length > 0) {
       const now = dayjs();
       let filteredOrders = [];
 
       if (timeframe === 'weekly') {
-        filteredOrders = allOrders.filter((order) =>
+        filteredOrders = chartOrders.filter((order) =>
           dayjs(order.createdAt).isAfter(now.subtract(7, 'day')),
         );
       } else if (timeframe === 'monthly') {
-        filteredOrders = allOrders.filter((order) =>
+        filteredOrders = chartOrders.filter((order) =>
           dayjs(order.createdAt).isAfter(now.startOf('month')),
         );
       } else if (timeframe === 'yearly') {
-        filteredOrders = allOrders.filter((order) =>
+        filteredOrders = chartOrders.filter((order) =>
           dayjs(order.createdAt).isAfter(now.startOf('year')),
         );
       } else {
-        filteredOrders = allOrders;
+        filteredOrders = chartOrders;
       }
 
       const productCountMap = {};
@@ -69,7 +65,7 @@ const MostSoldProductsPieChart = () => {
       setProductSales(pieData);
       setTotalSold(total);
     }
-  }, [allOrders, timeframe]);
+  }, [chartOrders, timeframe]);
 
   return (
     <div className="relative bg-white rounded-lg shadow py-6 px-4 overflow-hidden">

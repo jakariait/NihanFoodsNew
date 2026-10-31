@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuthAdminStore from '../../store/AuthAdminStore.js';
+import usePathaoConfigStore from '../../store/usePathaoConfigStore.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SectionHeader } from '@/component/componentAdmin/SectionHeader.jsx';
@@ -65,6 +66,7 @@ const AdminPathaoConfig = () => {
       await axios.patch(apiUrl, allowedFields, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      usePathaoConfigStore.getState().reset();
       toast.success('Pathao config updated successfully!');
     } catch (error) {
       toast.error('Failed to update config. Please try again.');
