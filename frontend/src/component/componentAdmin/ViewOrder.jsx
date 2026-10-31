@@ -506,10 +506,10 @@ const ViewOrder = () => {
             </Table>
             {isEditMode && (
               <div className="flex justify-start mt-4">
-                <Button onClick={() => setAddProductModalOpen(true)}>
-                  <Plus className="size-4 mr-1" />
-                  Add Product
-                </Button>
+              <Button onClick={() => setAddProductModalOpen(true)}>
+                <Plus className="size-4 mr-1" />
+                Add Product
+              </Button>
               </div>
             )}
           </div>
