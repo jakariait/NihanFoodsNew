@@ -432,7 +432,7 @@ const ViewOrder = () => {
               </TableHeader>
               <TableBody>
                 {currentOrderData?.items?.map((item, index) => {
-                  const product = item.product || item.productId;
+                  const product = item.product || null;
                   const variant = product?.variants?.[0];
                   const totalPrice = item.price * item.quantity;
 
@@ -440,25 +440,33 @@ const ViewOrder = () => {
                     <TableRow key={item._id || index}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        {product.images?.[0] ? (
+                        {product?.images?.[0] ? (
                           <ImageComponent
-                            imageName={product.images[0]}
+                            imageName={product?.images?.[0]}
                             className="size-12 rounded object-cover"
                             skeletonHeight={48}
-                            altName={product.name}
+                            altName={product?.name}
                           />
                         ) : (
                           <div className="size-12 rounded bg-muted" />
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium">{product.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Category: {product.category?.name}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Code: {product.productCode || 'N/A'}
-                        </div>
+                        {product ? (
+                          <>
+                            <div className="font-medium">{product.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Category: {product.category?.name}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Code: {product.productCode || 'N/A'}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-muted-foreground">
+                            Product not found
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
                         {variant ? getVariantDisplayName(variant) : 'N/A'}
