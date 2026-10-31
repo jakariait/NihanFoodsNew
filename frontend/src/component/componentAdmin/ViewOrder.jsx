@@ -432,7 +432,7 @@ const ViewOrder = () => {
               </TableHeader>
               <TableBody>
                 {currentOrderData?.items?.map((item, index) => {
-                  const product = item.product || null;
+                  const product = item.productId || null;
                   const variant = product?.variants?.[0];
                   const totalPrice = item.price * item.quantity;
 

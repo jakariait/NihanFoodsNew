@@ -5,7 +5,7 @@ import useBreadcrumbStore from '../store/BreadcrumbStore.js';
 const AddNewCategoryPage = () => {
   const setBreadcrumb = useBreadcrumbStore((s) => s.setBreadcrumb);
   useEffect(() => {
-    setBreadcrumb('CATEGORY', 'View All Categories');
+    setBreadcrumb('ORDER', 'View Order');
   }, []);
 
   return <ViewOrder />;
