@@ -1,43 +1,90 @@
-// const nodemailer = require("nodemailer");
-//
-// const sendEmail = async ({ to, subject, text }) => {
-//   let transporter = nodemailer.createTransport({
-//     service: "Gmail", // or your email provider
-//     auth: {
-//       user: process.env.EMAIL_USER,
-//       pass: process.env.EMAIL_PASS,
-//     },
-//   });
-//
-//   await transporter.sendMail({
-//     from: `"Your App" <${process.env.EMAIL_USER}>`,
-//     to,
-//     subject,
-//     text,
-//   });
-// };
-//
-// module.exports = sendEmail;
-
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
-const sendEmail = async ({ to, subject, text }) => {
-  let transporter = nodemailer.createTransport({
-    host: 'mail.sayuree.com', // ✅ NOT Gmail
-    port: 465, // ✅ Secure SSL port
-    secure: true, // ✅ true because port 465
-    auth: {
-      user: 'otp@sayuree.com', // ✅ full email
-      pass: 'fm#!#6bStkW}', // ✅ your real password
-    },
-  });
+// Reusable transporter
+let transporter = null;
 
-  await transporter.sendMail({
-    from: '"Sayuree" <otp@sayuree.com>', // Optional display name
-    to,
-    subject,
-    text,
-  });
+const getTransporter = () => {
+  if (!transporter) {
+    const port = Number(process.env.EMAIL_PORT) || 587;
+    const secure = port === 465;
+    const requireTLS = port === 587;
+
+    transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port,
+      secure,
+      ...(requireTLS && { requireTLS: true }),
+      tls: {
+        rejectUnauthorized: false, // Always enforce valid certificates
+      },
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
+
+  return transporter;
 };
 
-module.exports = sendEmail;
+// Sleep helper
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+const sendEmailMessage = async (
+  content,
+  subject = 'New Notification',
+  isHTML = false,
+  maxRetries = 3, // ✅ How many times to retry
+  retryDelay = 3000 // ✅ Wait time (ms)
+) => {
+  try {
+    const { EMAIL_FROM, ALERT_EMAILS } = process.env;
+
+    if (!ALERT_EMAILS) {
+      console.error('Email recipients missing.');
+      return;
+    }
+
+    const emailList = ALERT_EMAILS.split(',');
+
+    const transporter = getTransporter();
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`📧 Email attempt ${attempt}/${maxRetries}`);
+
+        const requests = emailList.map((email) =>
+          transporter.sendMail({
+            from: EMAIL_FROM,
+            to: email.trim(),
+            subject,
+
+            ...(isHTML ? { html: content } : { text: content }),
+          })
+        );
+
+        await Promise.all(requests);
+
+        console.log('✅ Email sent successfully');
+        return; // Stop after success
+      } catch (err) {
+        console.error(`❌ Attempt ${attempt} failed:`, err.message);
+
+        // Last try failed
+        if (attempt === maxRetries) {
+          throw err;
+        }
+
+        console.log(`⏳ Retrying in ${retryDelay / 1000}s...`);
+        await delay(retryDelay);
+      }
+    }
+  } catch (error) {
+    console.error('🚨 Email permanently failed:', error.message);
+
+    // Optional: save to DB / log file here
+  }
+};
+
+module.exports = sendEmailMessage;

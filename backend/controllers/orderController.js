@@ -1,5 +1,7 @@
 const User = require('../models/UserModel'); // Import the User model
 const orderService = require('../services/orderService');
+const generateOrderEmailHTML = require('../utility/orderEmailTemplate');
+const sendEmailMessage = require('../utility/sendEmail');
 
 const createOrder = async (req, res) => {
   try {
@@ -34,6 +36,20 @@ const createOrder = async (req, res) => {
       user.rewardPoints -= Number(rewardPointsUsed);
       await user.save();
     }
+
+    // ===============================
+    // 🔥 Background Email (Non-blocking)
+    // ===============================
+    process.nextTick(async () => {
+      try {
+        const emailOrder = await order.populate('items.productId', 'name');
+        const emailHTML = generateOrderEmailHTML(emailOrder);
+
+        await sendEmailMessage(emailHTML, `New Order Received #${order.orderNo} `, true);
+      } catch (err) {
+        console.error('Email failed (non-blocking):', err.message);
+      }
+    });
 
     res.status(201).json({
       success: true,
