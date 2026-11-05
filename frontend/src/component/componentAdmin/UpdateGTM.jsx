@@ -107,7 +107,7 @@ const UpdateGTM = () => {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="size-4 mr-1 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Updating...
               </>
             ) : (
